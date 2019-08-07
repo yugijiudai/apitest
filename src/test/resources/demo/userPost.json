@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "post",
+    "url": "/postForJson",
+    "param": {
+      "name": "lml",
+      "pwd": "111111"
+    }
+  },
+  "response": {
+    "code": 200,
+    "data": {
+      "name": "lml",
+      "pwd": "111111"
+    }
+  }
+}

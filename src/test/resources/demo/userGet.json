@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "get",
+    "url": "/get",
+    "param": {
+      "name": "lml"
+    }
+  },
+  "response": {
+    "code": 200,
+    "data": "lml"
+  }
+}
