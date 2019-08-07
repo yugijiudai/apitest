@@ -5,8 +5,7 @@ import cn.hutool.json.JSONUtil;
 import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.enums.MethodEnum;
 import com.lml.apitest.util.RestUtil;
-import com.lml.apitest.vo.ApiVo;
-import org.apache.commons.lang3.StringUtils;
+import com.lml.apitest.vo.RestVo;
 
 /**
  * @author yugi
@@ -21,14 +20,9 @@ public class GetHandler implements RequestHandler {
     }
 
     @Override
-    public ApiVo handleRequest(RequestDto requestDto) {
+    public RestVo<JSONObject> handleRequest(RequestDto requestDto) {
         JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
-        String header = reqObj.getStr(HEADER_KEY);
-        if (StringUtils.isBlank(header)) {
-            return RestUtil.get(requestDto.getUrl(), ApiVo.class, reqObj);
-        }
-        JSONObject headerJson = JSONUtil.parseObj(header);
-        return RestUtil.get(requestDto.getUrl(), ApiVo.class, reqObj, headerJson);
+        return RestUtil.get(requestDto.getUrl(), JSONObject.class, reqObj, requestDto.getHeader());
     }
 
 }

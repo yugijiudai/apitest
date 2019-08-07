@@ -1,6 +1,6 @@
 package com.lml.apitest.util;
 
-import com.lml.apitest.handler.ApiClientUtil;
+import com.lml.apitest.BaseTest;
 import org.junit.Test;
 
 /**
@@ -8,30 +8,31 @@ import org.junit.Test;
  * @apiNote
  * @since 2019-08-06
  */
-public class ApiClientUtilTest {
+public class ApiClientUtilTest extends BaseTest {
+
 
     @Test
     public void userPostTest() {
-        ApiClientUtil.doApiRequest("demo/userPost.json");
+        this.doRequest("demo/userPost.json");
     }
 
     @Test
     public void userPostFormTest() {
-        ApiClientUtil.doApiRequest("demo/userPostForm.json");
+        this.doRequest("demo/userPostForm.json");
     }
 
     @Test
     public void userPutTest() {
-        ApiClientUtil.doApiRequest("demo/userPut.json");
+        this.doRequest("demo/userPut.json");
     }
 
     @Test
     public void userGetTest() {
-        ApiClientUtil.doApiRequest("demo/userGet.json");
+        this.doRequest("demo/userGet.json");
     }
 
     @Test
     public void userDeleteTest() {
-        ApiClientUtil.doApiRequest("demo/userDelete.json");
+        this.doRequest("demo/userDelete.json");
     }
 }

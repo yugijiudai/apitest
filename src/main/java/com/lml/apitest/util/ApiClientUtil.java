@@ -1,23 +1,23 @@
-package com.lml.apitest.handler;
+package com.lml.apitest.util;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.enums.MethodEnum;
 import com.lml.apitest.exception.InitException;
 import com.lml.apitest.factory.RequestHandlerFactory;
-import com.lml.apitest.vo.ApiVo;
+import com.lml.apitest.handler.RequestCallBackHandler;
+import com.lml.apitest.handler.RequestHandler;
+import com.lml.apitest.vo.RestVo;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author yugi
@@ -43,45 +43,23 @@ public class ApiClientUtil {
         return "http://localhost:8080";
     }
 
-    public void doApiRequest(String fileName) {
+
+    public void doApiRequest(String fileName, List<RequestCallBackHandler> callBackLists) {
         JSONObject json = loadReqContent(fileName);
         RequestDto requestDto = JSONUtil.toBean(json.getStr(REQ_KEY), RequestDto.class);
         MethodEnum method = MethodEnum.parese(requestDto.getMethod());
         // 根据方法类型获取对应的请求处理器
         RequestHandler handler = RequestHandlerFactory.getHandler(method);
-        ApiVo actual = handler.doHandle(requestDto);
-        log.info("请求回来的数据是:{}", actual);
+        RestVo<JSONObject> actual = handler.doHandle(requestDto);
+        log.info("请求回来的数据是:{}", actual.getResult());
 
         // 获取断言的数据
         String response = json.getStr(RES_KEY);
-        ApiVo expectVo = JSONUtil.toBean(response, ApiVo.class);
-        log.info("断言的数据是:{}", expectVo);
-
-
-        assertResult(actual, expectVo);
-    }
-
-    private static void assertResult(ApiVo actual, ApiVo expectVo) {
-        Assert.assertEquals(expectVo.getCode(), actual.getCode());
-        String expectMsg = expectVo.getMsg();
-        if (StringUtils.isNotBlank(expectMsg)) {
-            Assert.assertEquals(expectMsg, actual.getMsg());
-        }
-        Object expectData = expectVo.getData();
-        if (expectData != null) {
-            String data = expectData.toString();
-            Object actualData = actual.getData();
-            if (JSONUtil.isJsonObj(data)) {
-                JSONObject expectJsonData = JSONUtil.parseObj(data);
-                JSONObject actualJsonData = JSONUtil.parseObj(actualData);
-                for (Map.Entry<String, Object> entry : expectJsonData.entrySet()) {
-                    Assert.assertEquals(entry.getValue(), actualJsonData.get(entry.getKey()));
-                }
-            }
-            else if (JSONUtil.isJsonArray(data)) {
-                JSONArray expectJsonArray = JSONUtil.parseArray(data);
-                JSONArray actualJsonArray = JSONUtil.parseArray(actualData.toString());
-                Assert.assertEquals(expectJsonArray, actualJsonArray);
+        JSONObject expectJson = JSONUtil.parseObj(response);
+        log.info("断言的数据是:{}", expectJson);
+        if (CollectionUtils.isNotEmpty(callBackLists)) {
+            for (RequestCallBackHandler requestCallBackHandler : callBackLists) {
+                requestCallBackHandler.doCallBack(actual, expectJson);
             }
         }
     }

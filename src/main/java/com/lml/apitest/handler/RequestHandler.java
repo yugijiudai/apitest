@@ -1,8 +1,10 @@
 package com.lml.apitest.handler;
 
+import cn.hutool.json.JSONObject;
 import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.enums.MethodEnum;
-import com.lml.apitest.vo.ApiVo;
+import com.lml.apitest.util.ApiClientUtil;
+import com.lml.apitest.vo.RestVo;
 
 /**
  * @author yugi
@@ -10,8 +12,6 @@ import com.lml.apitest.vo.ApiVo;
  * @since 2019-08-06
  */
 public interface RequestHandler {
-
-    String HEADER_KEY = "header";
 
     /**
      * 获取这个处理器需要处理的方法类型
@@ -24,17 +24,17 @@ public interface RequestHandler {
      * 处理请求
      *
      * @param requestDto {@link RequestDto}
-     * @return {@link ApiVo}
+     * @return {@link RestVo}
      */
-    ApiVo handleRequest(RequestDto requestDto);
+    RestVo<JSONObject> handleRequest(RequestDto requestDto);
 
     /**
      * 默认的处理
      *
      * @param requestDto {@link RequestDto}
-     * @return {@link ApiVo}
+     * @return {@link RestVo}
      */
-    default ApiVo doHandle(RequestDto requestDto) {
+    default RestVo<JSONObject> doHandle(RequestDto requestDto) {
         // TODO yugi: 2019/8/6  url可以相对路径或者全路径
         String baseUrl = ApiClientUtil.getUrl();
         requestDto.setUrl(baseUrl + requestDto.getUrl());

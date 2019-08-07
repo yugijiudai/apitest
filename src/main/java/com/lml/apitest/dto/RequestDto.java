@@ -1,5 +1,6 @@
 package com.lml.apitest.dto;
 
+import cn.hutool.json.JSONObject;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -26,5 +27,10 @@ public class RequestDto {
      * 请求的相对路径
      */
     private String url;
+
+    /**
+     * 请求头
+     */
+    private JSONObject header;
 
 }

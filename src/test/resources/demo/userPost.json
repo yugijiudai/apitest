@@ -5,6 +5,9 @@
     "param": {
       "name": "lml",
       "pwd": "111111"
+    },
+    "header": {
+      "token": "hello"
     }
   },
   "response": {
@@ -12,6 +15,9 @@
     "data": {
       "name": "lml",
       "pwd": "111111"
+    },
+    "headers": {
+      "token": "hello"
     }
   }
 }
