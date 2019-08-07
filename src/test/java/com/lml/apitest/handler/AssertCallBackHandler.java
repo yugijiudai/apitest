@@ -3,6 +3,8 @@ package com.lml.apitest.handler;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.lml.apitest.dto.SettingDto;
+import com.lml.apitest.util.InitUtil;
 import com.lml.apitest.vo.RestVo;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -19,16 +21,19 @@ public class AssertCallBackHandler implements RequestCallBackHandler {
 
     @Override
     public void doCallBack(RestVo<JSONObject> actual, JSONObject ext) {
-        // TODO yugi: 2019/8/7  获取code,msg,data需要在配置文件里配置
         JSONObject actualVo = actual.getResult();
-        Assert.assertEquals(ext.getInt("code"), actualVo.getInt("code"));
-        String expectMsg = ext.getStr("msg");
+        SettingDto settingDto = InitUtil.getSettingDto();
+        // 断言状态码
+        Assert.assertEquals(ext.getInt(settingDto.getCode()), actualVo.getInt(settingDto.getCode()));
+        String expectMsg = ext.getStr(settingDto.getMsg());
+        // 断言返回信息
         if (StringUtils.isNotBlank(expectMsg)) {
-            Assert.assertEquals(expectMsg, actualVo.getStr("msg"));
+            Assert.assertEquals(expectMsg, actualVo.getStr(settingDto.getMsg()));
         }
-        String expectData = ext.getStr("data");
+        // 断言内容体
+        String expectData = ext.getStr(settingDto.getData());
         if (StringUtils.isNotBlank(expectData)) {
-            String actualData = actualVo.getStr("data");
+            String actualData = actualVo.getStr(settingDto.getData());
             if (JSONUtil.isJsonObj(expectData)) {
                 JSONObject expectJsonData = JSONUtil.parseObj(expectData);
                 JSONObject actualJsonData = JSONUtil.parseObj(actualData);
@@ -40,6 +45,9 @@ public class AssertCallBackHandler implements RequestCallBackHandler {
                 JSONArray expectJsonArray = JSONUtil.parseArray(expectData);
                 JSONArray actualJsonArray = JSONUtil.parseArray(actualData);
                 Assert.assertEquals(expectJsonArray, actualJsonArray);
+            }
+            else {
+                Assert.assertEquals(expectData, actualData);
             }
         }
     }

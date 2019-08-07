@@ -22,6 +22,6 @@ public class PutHandler implements RequestHandler {
     @Override
     public RestVo<JSONObject> handleRequest(RequestDto requestDto) {
         JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
-        return RestUtil.put(requestDto.getUrl(), reqObj, JSONObject.class, requestDto.getHeader());
+        return RestUtil.put(requestDto.getUrl(), reqObj, JSONObject.class, requestDto.getHeaders());
     }
 }

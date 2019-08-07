@@ -22,7 +22,7 @@ public class GetHandler implements RequestHandler {
     @Override
     public RestVo<JSONObject> handleRequest(RequestDto requestDto) {
         JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
-        return RestUtil.get(requestDto.getUrl(), JSONObject.class, reqObj, requestDto.getHeader());
+        return RestUtil.get(requestDto.getUrl(), JSONObject.class, reqObj, requestDto.getHeaders());
     }
 
 }

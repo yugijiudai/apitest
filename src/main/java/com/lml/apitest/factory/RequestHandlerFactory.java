@@ -26,10 +26,6 @@ public class RequestHandlerFactory {
      */
     private final Map<MethodEnum, RequestHandler> requestHandler = MapUtil.newHashMap();
 
-    static {
-        initHandler(RequestHandler.class);
-    }
-
     /**
      * 初始化对应的处理器
      *

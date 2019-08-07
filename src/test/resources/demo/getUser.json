@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "get",
+    "url": "/getUser",
+    "param": {
+      "name": "${username}"
+    },
+    "headers": {
+      "helloWorld": "the world!!!",
+      "Cookie": [
+        {
+          "JSESSIONID": "${sessionId}",
+          "hi": "hello"
+        }
+      ]
+    }
+  },
+  "response": {
+    "code": 200,
+    "data": "${username}"
+  }
+}

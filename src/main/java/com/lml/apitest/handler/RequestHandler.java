@@ -2,8 +2,9 @@ package com.lml.apitest.handler;
 
 import cn.hutool.json.JSONObject;
 import com.lml.apitest.dto.RequestDto;
+import com.lml.apitest.dto.SettingDto;
 import com.lml.apitest.enums.MethodEnum;
-import com.lml.apitest.util.ApiClientUtil;
+import com.lml.apitest.util.InitUtil;
 import com.lml.apitest.vo.RestVo;
 
 /**
@@ -35,9 +36,12 @@ public interface RequestHandler {
      * @return {@link RestVo}
      */
     default RestVo<JSONObject> doHandle(RequestDto requestDto) {
-        // TODO yugi: 2019/8/6  url可以相对路径或者全路径
-        String baseUrl = ApiClientUtil.getUrl();
-        requestDto.setUrl(baseUrl + requestDto.getUrl());
+        SettingDto settingDto = InitUtil.getSettingDto();
+        String baseUrl = settingDto.getBaseUrl();
+        // 如果是使用相对路径,则重新拼接好要请求的url地址
+        if (requestDto.isUseRelativeUrl()) {
+            requestDto.setUrl(baseUrl + requestDto.getUrl());
+        }
         return handleRequest(requestDto);
     }
 

@@ -1,7 +1,12 @@
 package com.lml.apitest.util;
 
+import com.google.common.collect.Lists;
 import com.lml.apitest.BaseTest;
+import com.lml.apitest.handler.RequestCallBackHandler;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * @author yugi
@@ -34,5 +39,36 @@ public class ApiClientUtilTest extends BaseTest {
     @Test
     public void userDeleteTest() {
         this.doRequest("demo/userDelete.json");
+    }
+
+    @Test
+    public void getUserTest() {
+        RequestCallBackHandler loginHandler = (actual, ext) -> {
+            List<String> cookies = actual.getHttpHeaders().get("Set-Cookie");
+            if (CollectionUtils.isNotEmpty(cookies)) {
+                for (String cookie : cookies) {
+                    String[] split = cookie.split(";");
+                    for (String tmp : split) {
+                        String[] values = tmp.split("=");
+                        if (values[0].equals("JSESSIONID")) {
+                            GlobalVariableUtil.setCache("${sessionId}", values[1]);
+                        }
+                    }
+                }
+            }
+            GlobalVariableUtil.setCache("${username}", "lml");
+        };
+        this.selfDoRequest("demo/userLogin.json", true, Lists.newArrayList(loginHandler));
+        this.doRequest("demo/getUser.json");
+    }
+
+    @Test
+    public void userLoginTest() {
+        this.doRequest("demo/userLogin.json");
+    }
+
+    @Test
+    public void formatTest() {
+        InitUtil.loadReqContent("demo/testFormat.json");
     }
 }

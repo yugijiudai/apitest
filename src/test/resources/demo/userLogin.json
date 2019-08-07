@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "post",
+    "url": "/login",
+    "param": {
+      "name": "lml"
+    }
+  },
+  "response": {
+    "code": 200,
+    "data": {
+    }
+  }
+}

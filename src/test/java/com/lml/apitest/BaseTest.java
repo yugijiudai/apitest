@@ -1,9 +1,9 @@
 package com.lml.apitest;
 
 import com.google.common.collect.Lists;
-import com.lml.apitest.util.ApiClientUtil;
 import com.lml.apitest.handler.AssertCallBackHandler;
 import com.lml.apitest.handler.RequestCallBackHandler;
+import com.lml.apitest.util.ApiClientUtil;
 
 import java.util.List;
 
@@ -17,11 +17,18 @@ public abstract class BaseTest {
     private List<RequestCallBackHandler> callBackLists = Lists.newArrayList(new AssertCallBackHandler());
 
     protected void doRequest(String script) {
-        ApiClientUtil.doApiRequest(script, callBackLists);
+        this.doRequest(script, true);
     }
 
-    protected void selfDoRequest(String script, List<RequestCallBackHandler> selfHandler) {
-        List<RequestCallBackHandler> list = Lists.newArrayList(callBackLists);
+    protected void doRequest(String script, boolean useDefaultCallBack) {
+        ApiClientUtil.doApiRequest(script, useDefaultCallBack ? callBackLists : null);
+    }
+
+    protected void selfDoRequest(String script, boolean useDefaultCallBack, List<RequestCallBackHandler> selfHandler) {
+        List<RequestCallBackHandler> list = Lists.newArrayList();
+        if (useDefaultCallBack) {
+            list.addAll(callBackLists);
+        }
         list.addAll(selfHandler);
         ApiClientUtil.doApiRequest(script, list);
     }

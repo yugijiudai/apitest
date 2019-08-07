@@ -2,7 +2,7 @@ package com.lml.apitest.util;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.lml.apitest.dto.UserDto;
+import com.lml.apitest.demo.UserDto;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,10 +13,9 @@ import org.junit.Test;
  */
 public class RestUtilTest {
 
-    private static final String URL = "http://localhost:8080/";
+    private static final String URL = InitUtil.getSettingDto().getBaseUrl();
 
     private UserDto reqUserDto = new UserDto().setName("测试中文").setPwd("111111");
-
 
     @Test
     public void getTest() {

@@ -2,6 +2,10 @@ package com.lml.apitest.util;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.lml.apitest.vo.RestVo;
 import lombok.experimental.UtilityClass;
@@ -16,6 +20,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -229,12 +234,37 @@ public class RestUtil {
      */
     private HttpHeaders buildHttpHeaders(Map<String, Object> headers) {
         HttpHeaders requestHeaders = new HttpHeaders();
-        if (MapUtils.isNotEmpty(headers)) {
-            for (Map.Entry<String, Object> head : headers.entrySet()) {
-                requestHeaders.add(head.getKey(), head.getValue().toString());
-            }
+        if (MapUtils.isEmpty(headers)) {
+            return requestHeaders;
         }
+        // 遍历headers对象
+        for (Map.Entry<String, Object> head : headers.entrySet()) {
+            String key = head.getKey();
+            Object value = head.getValue();
+            if (HttpHeaders.COOKIE.equals(key)) {
+                requestHeaders.put(HttpHeaders.COOKIE, getCookieList(value));
+                continue;
+            }
+            requestHeaders.add(key, value.toString());
+        }
+        log.debug("要传输的headers如下:{}", headers);
         return requestHeaders;
+    }
+
+    /**
+     * 获得cookieList,因为要传cookie,header需要这样设置:requestHeaders.put(HttpHeaders.COOKIE, cookieList)
+     *
+     * @param cookiesJsonArr cookie的json数组字符串
+     * @return 返回设置好的格式, 格式如下:["JSESSIONID=xxx", "name=lml"]
+     */
+    private List<String> getCookieList(Object cookiesJsonArr) {
+        JSONArray array = JSONUtil.parseArray(cookiesJsonArr);
+        List<String> cookieList = Lists.newArrayList();
+        array.forEach(obj -> {
+            JSONObject tmp = (JSONObject) obj;
+            tmp.forEach((key, val) -> cookieList.add(key + "=" + val));
+        });
+        return cookieList;
     }
 
 }

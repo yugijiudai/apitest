@@ -31,6 +31,11 @@ public class RequestDto {
     /**
      * 请求头
      */
-    private JSONObject header;
+    private JSONObject headers;
+
+    /**
+     * url是否使用相对路径,如果这个值为false,则url要写全路径
+     */
+    private boolean useRelativeUrl = true;
 
 }

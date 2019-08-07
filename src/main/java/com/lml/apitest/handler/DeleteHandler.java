@@ -6,7 +6,6 @@ import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.enums.MethodEnum;
 import com.lml.apitest.util.RestUtil;
 import com.lml.apitest.vo.RestVo;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author yugi
@@ -23,6 +22,6 @@ public class DeleteHandler implements RequestHandler {
     @Override
     public RestVo<JSONObject> handleRequest(RequestDto requestDto) {
         JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
-        return RestUtil.delete(requestDto.getUrl(), JSONObject.class, reqObj, requestDto.getHeader());
+        return RestUtil.delete(requestDto.getUrl(), JSONObject.class, reqObj, requestDto.getHeaders());
     }
 }
