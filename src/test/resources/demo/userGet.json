@@ -3,7 +3,7 @@
     "method": "get",
     "url": "/get",
     "param": {
-      "name": "lml"
+      "name": "${username}"
     }
   },
   "response": {

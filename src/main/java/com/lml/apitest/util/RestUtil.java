@@ -218,7 +218,9 @@ public class RestUtil {
      * @return {@link RestVo}
      */
     private static <T> RestVo<T> handleRequest(String url, HttpMethod method, Class<T> returnType, HttpEntity<Object> requestEntity) {
+        long start = System.currentTimeMillis();
         ResponseEntity<T> exchange = restTemplate.exchange(url, method, requestEntity, returnType);
+        log.debug("{}请求消耗了:{}ms", url, System.currentTimeMillis() - start);
         T body = exchange.getBody();
         log.info("请求回来的参数是:{}", body);
         RestVo<T> restVo = new RestVo<>();

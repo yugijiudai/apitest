@@ -1,5 +1,6 @@
 package com.lml.apitest;
 
+import cn.hutool.json.JSONObject;
 import com.google.common.collect.Lists;
 import com.lml.apitest.handler.AssertCallBackHandler;
 import com.lml.apitest.handler.RequestCallBackHandler;
@@ -16,14 +17,44 @@ public abstract class BaseTest {
 
     private List<RequestCallBackHandler> callBackLists = Lists.newArrayList(new AssertCallBackHandler());
 
+    /**
+     * 加载脚本执行请求
+     *
+     * @param script 需要加载的脚本
+     */
     protected void doRequest(String script) {
         this.doRequest(script, true);
     }
 
+
+    /**
+     * 加载脚本执行请求
+     *
+     * @param script             需要加载的脚本
+     * @param useDefaultCallBack 是否要执行默认的回调
+     */
     protected void doRequest(String script, boolean useDefaultCallBack) {
         ApiClientUtil.doApiRequest(script, useDefaultCallBack ? callBackLists : null);
     }
 
+
+    /**
+     * 传加载好的脚本执行请求
+     *
+     * @param json               加载好的脚本
+     * @param useDefaultCallBack 是否要执行默认的回调
+     */
+    protected void doRequest(JSONObject json, boolean useDefaultCallBack) {
+        ApiClientUtil.doApiRequest(json, useDefaultCallBack ? callBackLists : null);
+    }
+
+    /**
+     * 传加载好的脚本执行请求,并且执行自定义的回调
+     *
+     * @param script             需要加载的脚本
+     * @param useDefaultCallBack 是否要执行默认的回调
+     * @param selfHandler        自定义的回调
+     */
     protected void selfDoRequest(String script, boolean useDefaultCallBack, List<RequestCallBackHandler> selfHandler) {
         List<RequestCallBackHandler> list = Lists.newArrayList();
         if (useDefaultCallBack) {

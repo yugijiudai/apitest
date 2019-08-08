@@ -3,11 +3,11 @@
     "method": "delete",
     "url": "/delete",
     "param": {
-      "name": "lml"
+      "name": "${username}"
     }
   },
   "response": {
     "code": 200,
-    "data": "lml"
+    "data": "${username}"
   }
 }

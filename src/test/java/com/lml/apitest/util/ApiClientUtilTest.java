@@ -1,5 +1,7 @@
 package com.lml.apitest.util;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import com.google.common.collect.Lists;
 import com.lml.apitest.BaseTest;
 import com.lml.apitest.handler.RequestCallBackHandler;
@@ -67,8 +69,12 @@ public class ApiClientUtilTest extends BaseTest {
         this.doRequest("demo/userLogin.json");
     }
 
+
     @Test
-    public void formatTest() {
-        InitUtil.loadReqContent("demo/testFormat.json");
+    public void loadSelfDataTest() {
+        JSONArray objects = InitUtil.loadSelfData("demo/data/userData.json", "demo/userDelete.json");
+        objects.forEach(json -> {
+            this.doRequest((JSONObject) json, true);
+        });
     }
 }

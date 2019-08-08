@@ -42,6 +42,16 @@ public class ApiClientUtil {
      */
     public void doApiRequest(String fileName, List<RequestCallBackHandler> callBackLists) {
         JSONObject json = InitUtil.loadReqContent(fileName);
+        doApiRequest(json, callBackLists);
+    }
+
+    /**
+     * 直接传加载好的脚本并且进行接口的请求
+     *
+     * @param json          加载好的脚本
+     * @param callBackLists 请求接口后需要执行的回调,是个list,可以自己定义然后回调的处理顺序
+     */
+    public void doApiRequest(JSONObject json, List<RequestCallBackHandler> callBackLists) {
         // 将request的内容映射到对应的实体类里
         RequestDto requestDto = JSONUtil.toBean(json.getStr(REQ_KEY), RequestDto.class);
         MethodEnum method = MethodEnum.parese(requestDto.getMethod());

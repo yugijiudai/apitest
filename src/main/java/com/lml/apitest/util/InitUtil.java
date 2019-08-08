@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ReUtil;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.setting.dialect.Props;
@@ -39,10 +40,6 @@ public class InitUtil {
 
     static {
         initRequestHandle();
-        // TODO yugi: 2019/8/8  待删除
-        GlobalVariableUtil.setCache("${test_username}", "lml");
-        GlobalVariableUtil.setCache("${test_sessionId}", "10086");
-        GlobalVariableUtil.setCache("${test_helloWorld}", "helloWorld");
     }
 
     /**
@@ -52,12 +49,43 @@ public class InitUtil {
      * @return 返回脚本的json格式
      */
     public JSONObject loadReqContent(String fileName) {
+        String script = loadScript(fileName);
+        return JSONUtil.parseObj(formatVariable(script));
+    }
+
+    /**
+     * 获取脚本
+     *
+     * @param fileName 脚本的名字
+     * @return 返回读取的脚本
+     */
+    private String loadScript(String fileName) {
         URL resource = ResourceUtil.getResource(fileName);
         if (resource == null) {
             throw new InitException("找不到要加载的脚本 " + fileName);
         }
-        String script = FileUtil.readString(FileUtil.file(resource), StandardCharsets.UTF_8);
-        return JSONUtil.parseObj(formatVariable(script));
+        return FileUtil.readString(FileUtil.file(resource), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 将data数据源文件的值替换到需要加载的脚本的变量里
+     *
+     * @param dataName 数据源文件,json数组格式
+     * @param fileName 脚本文件
+     * @return 返回替换好的请求数据
+     */
+    public JSONArray loadSelfData(String dataName, String fileName) {
+        String data = loadScript(dataName);
+        String script = loadScript(fileName);
+        JSONArray needHandle = JSONUtil.createArray();
+        JSONArray array = JSONUtil.parseArray(data);
+        for (int i = 0; i < array.size(); i++) {
+            JSONObject obj = array.getJSONObject(i);
+            obj.forEach((key, val) -> GlobalVariableUtil.setCache("${" + key + "}", val));
+            JSONObject newObj = JSONUtil.parseObj(formatVariable(script));
+            needHandle.add(newObj);
+        }
+        return needHandle;
     }
 
 
@@ -83,7 +111,7 @@ public class InitUtil {
     }
 
     /**
-     * 替换有占位符的脚本
+     * 替换有占位符${xxx}的脚本
      *
      * @param script 加载好的脚本
      * @return 返回替换好的占位符

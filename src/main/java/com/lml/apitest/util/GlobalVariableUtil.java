@@ -36,9 +36,6 @@ public class GlobalVariableUtil {
      * @param val 缓存的值
      */
     public void setCache(String key, Object val) {
-        if (timedCache.containsKey(key)) {
-            throw new BizException("缓存:" + key + "已经存在!");
-        }
         timedCache.put(key, val);
     }
 }
