@@ -7,7 +7,7 @@ import com.lml.apitest.dto.SettingDto;
 import com.lml.apitest.util.InitUtil;
 import com.lml.apitest.vo.RestVo;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
+import org.testng.Assert;
 
 import java.util.Map;
 

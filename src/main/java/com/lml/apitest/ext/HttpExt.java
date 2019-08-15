@@ -73,7 +73,7 @@ public class HttpExt implements ReqExt {
      */
     private HttpResponse doFormRequest(HttpRequest req, Map<String, Object> headers, Map<String, Object> params) {
         this.setRequestHeader(headers, req);
-        return req.form(params).execute();
+        return exe(req.form(params));
     }
 
     /**
@@ -86,7 +86,14 @@ public class HttpExt implements ReqExt {
      */
     private HttpResponse doJsonRequest(HttpRequest req, Map<String, Object> headers, Object obj) {
         this.setRequestHeader(headers, req);
-        return req.body(JSONUtil.toJsonStr(obj)).execute();
+        return exe(req.body(JSONUtil.toJsonStr(obj)));
+    }
+
+    private HttpResponse exe(HttpRequest httpRequest) {
+        long start = System.currentTimeMillis();
+        HttpResponse execute = httpRequest.execute();
+        log.debug("{}请求消耗了:{}ms", httpRequest.getUrl(), System.currentTimeMillis() - start);
+        return execute;
     }
 
 

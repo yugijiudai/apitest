@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.lml.apitest.BaseTest;
 import com.lml.apitest.handler.RequestCallBackHandler;
 import org.apache.commons.collections4.CollectionUtils;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.List;
 
