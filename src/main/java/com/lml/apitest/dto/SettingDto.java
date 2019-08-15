@@ -32,5 +32,9 @@ public class SettingDto {
      */
     private String data;
 
+    /**
+     * 请求使用的底层类
+     */
+    private String reqExt;
 
 }

@@ -4,12 +4,15 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.setting.dialect.Props;
 import com.lml.apitest.dto.SettingDto;
 import com.lml.apitest.exception.InitException;
+import com.lml.apitest.ext.ReqAdapter;
+import com.lml.apitest.ext.ReqExt;
 import com.lml.apitest.factory.RequestHandlerFactory;
 import com.lml.apitest.handler.RequestHandler;
 import lombok.Getter;
@@ -51,6 +54,18 @@ public class InitUtil {
     public JSONObject loadReqContent(String fileName) {
         String script = loadScript(fileName);
         return JSONUtil.parseObj(formatVariable(script));
+    }
+
+
+    /**
+     * 根据配置文件配置的来初始化http请求的底层调用类
+     *
+     * @return {@link ReqAdapter}
+     */
+    public ReqAdapter initReqAdapter() {
+        ReqExt reqExt = ReflectUtil.newInstance(settingDto.getReqExt());
+        log.info("默认的http请求类是{}.............", reqExt);
+        return new ReqAdapter(reqExt);
     }
 
     /**

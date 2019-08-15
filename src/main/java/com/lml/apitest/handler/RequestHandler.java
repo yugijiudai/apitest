@@ -4,7 +4,6 @@ import cn.hutool.json.JSONObject;
 import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.dto.SettingDto;
 import com.lml.apitest.enums.MethodEnum;
-import com.lml.apitest.ext.HttpExt;
 import com.lml.apitest.ext.ReqAdapter;
 import com.lml.apitest.util.InitUtil;
 import com.lml.apitest.vo.RestVo;
@@ -16,8 +15,7 @@ import com.lml.apitest.vo.RestVo;
  */
 public interface RequestHandler {
 
-    // ReqAdapter REQ_ADAPTER = new ReqAdapter(new RestUtilExt());
-    ReqAdapter REQ_ADAPTER = new ReqAdapter(new HttpExt());
+    ReqAdapter REQ_ADAPTER = InitUtil.initReqAdapter();
 
     /**
      * 获取这个处理器需要处理的方法类型
