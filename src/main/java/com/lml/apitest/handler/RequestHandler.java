@@ -5,6 +5,7 @@ import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.dto.SettingDto;
 import com.lml.apitest.enums.MethodEnum;
 import com.lml.apitest.ext.ReqAdapter;
+import com.lml.apitest.ext.RestUtilExt;
 import com.lml.apitest.util.InitUtil;
 import com.lml.apitest.vo.RestVo;
 
@@ -15,7 +16,7 @@ import com.lml.apitest.vo.RestVo;
  */
 public interface RequestHandler {
 
-    ReqAdapter REQ_ADAPTER = InitUtil.initReqAdapter();
+    ReqAdapter REQ_ADAPTER = InitUtil.initReqAdapter(null);
 
     /**
      * 获取这个处理器需要处理的方法类型

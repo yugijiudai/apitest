@@ -46,22 +46,23 @@ public class ApiClientUtilTest extends BaseTest {
     @Test
     public void getUserTest() {
         RequestCallBackHandler loginHandler = (actual, ext) -> {
-            List<String> cookies = actual.getHttpHeaders().get("Set-Cookie");
-            if (CollectionUtils.isNotEmpty(cookies)) {
-                for (String cookie : cookies) {
-                    String[] split = cookie.split(";");
-                    for (String tmp : split) {
-                        String[] values = tmp.split("=");
-                        if (values[0].equals("JSESSIONID")) {
-                            GlobalVariableUtil.setCache("${sessionId}", values[1]);
-                        }
-                    }
-                }
-            }
             JSONObject result = actual.getResult();
             // 登录返回了一个随机值
             GlobalVariableUtil.setCache("${random}", result.getStr("data"));
             GlobalVariableUtil.setCache("${username}", "lml");
+            List<String> cookies = actual.getHttpHeaders().get("Set-Cookie");
+            if (CollectionUtils.isEmpty(cookies)) {
+                return;
+            }
+            for (String cookie : cookies) {
+                String[] split = cookie.split(";");
+                for (String tmp : split) {
+                    String[] values = tmp.split("=");
+                    if (values[0].equals("JSESSIONID")) {
+                        GlobalVariableUtil.setCache("${sessionId}", values[1]);
+                    }
+                }
+            }
         };
         // 先登录,然后回调中获取sessionId和登录时返回的随机字符串
         this.selfDoRequest("demo/userLogin.json", true, Lists.newArrayList(loginHandler));

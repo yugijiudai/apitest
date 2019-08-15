@@ -60,10 +60,12 @@ public class InitUtil {
     /**
      * 根据配置文件配置的来初始化http请求的底层调用类
      *
+     * @param clz 指定使用的请求类,如果没有则使用配置里面的
      * @return {@link ReqAdapter}
      */
-    public ReqAdapter initReqAdapter() {
-        ReqExt reqExt = ReflectUtil.newInstance(settingDto.getReqExt());
+    public ReqAdapter initReqAdapter(Class clz) {
+        String initClassName = clz != null ? clz.getName() : settingDto.getReqExt();
+        ReqExt reqExt = ReflectUtil.newInstance(initClassName);
         log.info("默认的http请求类是{}.............", reqExt);
         return new ReqAdapter(reqExt);
     }
