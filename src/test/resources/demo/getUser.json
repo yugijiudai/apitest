@@ -17,6 +17,6 @@
   },
   "response": {
     "code": 200,
-    "data": "${username}"
+    "data": "${random}"
   }
 }

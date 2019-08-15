@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author yugi
@@ -30,7 +31,10 @@ public class TestController {
     }
 
     @PostMapping(value = "/postForForm")
-    public JSONObject postForForm(UserDto userDto, HttpServletRequest req) {
+    public JSONObject postForForm(UserDto userDto, HttpServletRequest req, HttpServletResponse res) {
+        res.addHeader("hello", "asasasas");
+        System.out.println(req.getHeader("hello"));
+        System.out.println(req.getHeader("okc"));
         return buildJsonSuccess(userDto);
     }
 
@@ -53,7 +57,7 @@ public class TestController {
     public JSONObject login(@RequestBody UserDto userDto, HttpServletRequest request) {
         String random = IdUtil.randomUUID();
         request.getSession().setAttribute(userDto.getName(), random);
-        return buildSuccess(null);
+        return buildSuccess(random);
     }
 
     @GetMapping(value = "/getUser")

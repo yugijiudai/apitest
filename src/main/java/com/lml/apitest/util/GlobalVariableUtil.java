@@ -13,7 +13,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class GlobalVariableUtil {
 
-    private TimedCache<String, Object> timedCache = CacheUtil.newTimedCache(60 * 60);
+
+    private TimedCache<String, Object> timedCache = CacheUtil.newTimedCache(1000 * 60 * 60);
 
     /**
      * 获取缓存

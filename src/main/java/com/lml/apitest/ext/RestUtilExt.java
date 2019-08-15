@@ -1,14 +1,9 @@
-package com.lml.apitest.util;
+package com.lml.apitest.ext;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.lml.apitest.vo.RestVo;
-import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.http.HttpEntity;
@@ -20,34 +15,19 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author yugi
- * @apiNote
+ * @apiNote 底层使用RestTemplate去请求
  * @since 2019-08-06
  */
 @Slf4j
-@UtilityClass
-public class RestUtil {
+public class RestUtilExt implements ReqExt {
 
 
     private RestTemplate restTemplate = new RestTemplate();
 
-
-    /**
-     * post方法,使用formData格式来传参(没有请求头)
-     *
-     * @param url        请求url
-     * @param obj        post请求的参数
-     * @param returnType 返回值的类
-     * @param <T>        返回值的类
-     * @return 返回值的类
-     */
-    public <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType) {
-        return postForForm(url, obj, returnType, null);
-    }
 
     /**
      * post方法,使用formData格式来传参(自定义请求头)
@@ -59,6 +39,7 @@ public class RestUtil {
      * @param <T>        返回值的类
      * @return 返回值的类
      */
+    @Override
     public <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers) {
         Map<String, Object> map = Maps.newHashMap();
         BeanUtil.copyProperties(obj, map);
@@ -69,17 +50,6 @@ public class RestUtil {
         return request(url, HttpMethod.POST, formData, returnType, headers);
     }
 
-    /**
-     * post方法,使用json格式来传参,后端需要用@requestBody来接受(没有请求头)
-     *
-     * @param url        请求url
-     * @param obj        post请求的参数
-     * @param returnType 返回值的类
-     * @return 返回值的类
-     */
-    public <T> RestVo<T> post(String url, Object obj, Class<T> returnType) {
-        return post(url, obj, returnType, null);
-    }
 
     /**
      * post方法,使用json格式来传参,后端需要用@requestBody来接受(自定义请求头)
@@ -91,21 +61,11 @@ public class RestUtil {
      * @param <T>        返回值的类
      * @return 返回值的类
      */
+    @Override
     public <T> RestVo<T> post(String url, Object obj, Class<T> returnType, Map<String, Object> headers) {
         return request(url, HttpMethod.POST, obj, returnType, headers);
     }
 
-    /**
-     * get方法
-     *
-     * @param url        请求url
-     * @param returnType 返回值的类
-     * @param params     请求的参数
-     * @return 返回值的类
-     */
-    public <T> RestVo<T> get(String url, Class<T> returnType, Map<String, Object> params) {
-        return get(url, returnType, params, null);
-    }
 
     /**
      * get方法(没有请求头)
@@ -117,6 +77,7 @@ public class RestUtil {
      * @param <T>        返回值的类
      * @return 返回值的类
      */
+    @Override
     public <T> RestVo<T> get(String url, Class<T> returnType, Map<String, Object> params, Map<String, Object> headers) {
         return request(url, HttpMethod.GET, params, returnType, headers);
     }
@@ -129,31 +90,9 @@ public class RestUtil {
      * @param returnType 返回值的类
      * @return 返回值的类
      */
+    @Override
     public <T> RestVo<T> put(String url, Object obj, Class<T> returnType, Map<String, Object> headers) {
         return request(url, HttpMethod.PUT, obj, returnType, headers);
-    }
-
-    /**
-     * put方法(没有请求头)
-     *
-     * @param url        请求url
-     * @param returnType 返回值的类
-     * @return 返回值的类
-     */
-    public <T> RestVo<T> put(String url, Object obj, Class<T> returnType) {
-        return put(url, obj, returnType, null);
-    }
-
-
-    /**
-     * delete方法(没有请求头)
-     *
-     * @param url        请求url
-     * @param returnType 返回值的类
-     * @return 返回值的类
-     */
-    public <T> RestVo<T> delete(String url, Class<T> returnType, Map<String, Object> params) {
-        return delete(url, returnType, params, null);
     }
 
 
@@ -166,6 +105,7 @@ public class RestUtil {
      * @param <T>        返回值的类
      * @return 返回值的类
      */
+    @Override
     public <T> RestVo<T> delete(String url, Class<T> returnType, Map<String, Object> params, Map<String, Object> headers) {
         return request(url, HttpMethod.DELETE, params, returnType, headers);
     }
@@ -217,7 +157,7 @@ public class RestUtil {
      * @param <T>           请求返回的内容
      * @return {@link RestVo}
      */
-    private static <T> RestVo<T> handleRequest(String url, HttpMethod method, Class<T> returnType, HttpEntity<Object> requestEntity) {
+    private <T> RestVo<T> handleRequest(String url, HttpMethod method, Class<T> returnType, HttpEntity<Object> requestEntity) {
         long start = System.currentTimeMillis();
         ResponseEntity<T> exchange = restTemplate.exchange(url, method, requestEntity, returnType);
         log.debug("{}请求消耗了:{}ms", url, System.currentTimeMillis() - start);
@@ -253,20 +193,5 @@ public class RestUtil {
         return requestHeaders;
     }
 
-    /**
-     * 获得cookieList,因为要传cookie,header需要这样设置:requestHeaders.put(HttpHeaders.COOKIE, cookieList)
-     *
-     * @param cookiesJsonArr cookie的json数组字符串
-     * @return 返回设置好的格式, 格式如下:["JSESSIONID=xxx", "name=lml"]
-     */
-    private List<String> getCookieList(Object cookiesJsonArr) {
-        JSONArray array = JSONUtil.parseArray(cookiesJsonArr);
-        List<String> cookieList = Lists.newArrayList();
-        array.forEach(obj -> {
-            JSONObject tmp = (JSONObject) obj;
-            tmp.forEach((key, val) -> cookieList.add(key + "=" + val));
-        });
-        return cookieList;
-    }
 
 }

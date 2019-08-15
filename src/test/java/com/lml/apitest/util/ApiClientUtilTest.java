@@ -58,8 +58,12 @@ public class ApiClientUtilTest extends BaseTest {
                     }
                 }
             }
+            JSONObject result = actual.getResult();
+            // 登录返回了一个随机值
+            GlobalVariableUtil.setCache("${random}", result.getStr("data"));
             GlobalVariableUtil.setCache("${username}", "lml");
         };
+        // 先登录,然后回调中获取sessionId和登录时返回的随机字符串
         this.selfDoRequest("demo/userLogin.json", true, Lists.newArrayList(loginHandler));
         this.doRequest("demo/getUser.json");
     }

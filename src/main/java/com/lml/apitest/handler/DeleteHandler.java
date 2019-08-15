@@ -4,7 +4,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.enums.MethodEnum;
-import com.lml.apitest.util.RestUtil;
+import com.lml.apitest.ext.ReqAdapter;
 import com.lml.apitest.vo.RestVo;
 
 /**
@@ -22,6 +22,6 @@ public class DeleteHandler implements RequestHandler {
     @Override
     public RestVo<JSONObject> handleRequest(RequestDto requestDto) {
         JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
-        return RestUtil.delete(requestDto.getUrl(), JSONObject.class, reqObj, requestDto.getHeaders());
+        return REQ_ADAPTER.delete(requestDto.getUrl(), JSONObject.class, reqObj, requestDto.getHeaders());
     }
 }
