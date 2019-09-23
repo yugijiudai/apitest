@@ -1,11 +1,11 @@
 package com.lml.apitest.util;
 
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.google.common.collect.Lists;
 import com.lml.apitest.BaseTest;
 import com.lml.apitest.handler.RequestCallBackHandler;
 import org.apache.commons.collections4.CollectionUtils;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -17,6 +17,11 @@ import java.util.List;
  */
 public class ApiClientUtilTest extends BaseTest {
 
+
+    @BeforeClass
+    public void doBefore() {
+        GlobalVariableUtil.setCache("${username}", "lml");
+    }
 
     @Test
     public void userPostTest() {
@@ -49,7 +54,6 @@ public class ApiClientUtilTest extends BaseTest {
             JSONObject result = actual.getResult();
             // 登录返回了一个随机值
             GlobalVariableUtil.setCache("${random}", result.getStr("data"));
-            GlobalVariableUtil.setCache("${username}", "lml");
             List<String> cookies = actual.getHttpHeaders().get("Set-Cookie");
             if (CollectionUtils.isEmpty(cookies)) {
                 return;
@@ -75,11 +79,4 @@ public class ApiClientUtilTest extends BaseTest {
     }
 
 
-    @Test
-    public void loadSelfDataTest() {
-        JSONArray objects = InitUtil.loadSelfData("demo/data/userData.json", "demo/userDelete.json");
-        objects.forEach(json -> {
-            this.doRequest((JSONObject) json, true);
-        });
-    }
 }

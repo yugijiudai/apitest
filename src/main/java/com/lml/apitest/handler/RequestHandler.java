@@ -5,7 +5,6 @@ import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.dto.SettingDto;
 import com.lml.apitest.enums.MethodEnum;
 import com.lml.apitest.ext.ReqAdapter;
-import com.lml.apitest.ext.RestUtilExt;
 import com.lml.apitest.util.InitUtil;
 import com.lml.apitest.vo.RestVo;
 

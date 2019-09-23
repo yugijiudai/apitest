@@ -1,16 +1,25 @@
 package com.lml.apitest.ext;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Maps;
+import com.lml.apitest.dto.RequestContentDto;
+import com.lml.apitest.enums.RequestStatusEnum;
+import com.lml.apitest.exception.RequestException;
+import com.lml.apitest.po.RequestContent;
+import com.lml.apitest.service.RequestContentService;
+import com.lml.apitest.service.RequestContentServiceImpl;
 import com.lml.apitest.vo.RestVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,13 +32,15 @@ import java.util.Map;
 public class HttpExt implements ReqExt {
 
 
+    private RequestContentService requestContentServiceImpl = new RequestContentServiceImpl();
+
     @Override
     public <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers) {
         HttpRequest post = HttpRequest.post(url);
         this.setRequestHeader(headers, post);
         Map<String, Object> map = Maps.newHashMap();
         BeanUtil.copyProperties(obj, map);
-        HttpResponse execute = post.form(map).execute();
+        HttpResponse execute = doFormRequest(post, headers, map);
         return afterReq(returnType, execute);
     }
 
@@ -73,7 +84,8 @@ public class HttpExt implements ReqExt {
      */
     private HttpResponse doFormRequest(HttpRequest req, Map<String, Object> headers, Map<String, Object> params) {
         this.setRequestHeader(headers, req);
-        return exe(req.form(params));
+        RequestContentDto requestContentDto = buildRequestContentDtoCommon(params, headers, req);
+        return exe(req.form(params), requestContentDto);
     }
 
     /**
@@ -86,13 +98,54 @@ public class HttpExt implements ReqExt {
      */
     private HttpResponse doJsonRequest(HttpRequest req, Map<String, Object> headers, Object obj) {
         this.setRequestHeader(headers, req);
-        return exe(req.body(JSONUtil.toJsonStr(obj)));
+        String content = JSONUtil.toJsonStr(obj);
+        RequestContentDto requestContentDto = buildRequestContentDtoCommon(obj, headers, req);
+        return exe(req.body(content), requestContentDto);
     }
 
-    private HttpResponse exe(HttpRequest httpRequest) {
+    /**
+     * 构建公共的头部,内容,方法,url等公共参数
+     *
+     * @param content     请求的内容
+     * @param headers     请求的头部
+     * @param httpRequest 请求的对象
+     * @return 返回构造好的dto
+     */
+    private RequestContentDto buildRequestContentDtoCommon(Object content, Map<String, Object> headers, HttpRequest httpRequest) {
+        RequestContentDto requestContentDto = new RequestContentDto();
+        return requestContentDto.setContent(JSONUtil.toJsonStr(content)).setHeaders(headers).setUrl(httpRequest.getUrl()).setMethod(httpRequest.getMethod());
+    }
+
+    /**
+     * 真正触发请求
+     *
+     * @param httpRequest       {@link HttpRequest}
+     * @param requestContentDto 请求的dto
+     * @return 返回请求的结果
+     */
+    private HttpResponse exe(HttpRequest httpRequest, RequestContentDto requestContentDto) {
         long start = System.currentTimeMillis();
-        HttpResponse execute = httpRequest.execute();
-        log.debug("{}请求消耗了:{}ms", httpRequest.getUrl(), System.currentTimeMillis() - start);
+        requestContentDto.setStartTime(DateUtil.date(start));
+        // 请求前记录
+        RequestContent requestContent = requestContentServiceImpl.beforeRequest(requestContentDto);
+        HttpResponse execute;
+        RequestContent update = new RequestContent().setId(requestContent.getId());
+        try {
+            execute = httpRequest.execute();
+            log.debug("{}请求消耗了:{}ms", httpRequest.getUrl(), System.currentTimeMillis() - start);
+            update.setRequestStatus(RequestStatusEnum.OK);
+            Integer.parseInt("fwew");
+        }
+        catch (Throwable e) {
+            // 设置异常信息
+            update.setExceptionMsg(ExceptionUtil.stacktraceToString(e)).setRequestStatus(RequestStatusEnum.FAIL);
+            log.error(e.getMessage(), e);
+            throw new RequestException(e);
+        }
+        finally {
+            // 设置请求结束时间
+            requestContentServiceImpl.afterRequest(update.setEndTime(new Date()));
+        }
         return execute;
     }
 

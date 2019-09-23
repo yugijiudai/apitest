@@ -4,7 +4,6 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.enums.MethodEnum;
-import com.lml.apitest.ext.ReqAdapter;
 import com.lml.apitest.vo.RestVo;
 
 /**

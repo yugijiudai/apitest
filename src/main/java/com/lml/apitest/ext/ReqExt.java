@@ -60,7 +60,9 @@ public interface ReqExt {
      * put方法(有请求头)
      *
      * @param url        请求url
+     * @param obj        请求的内容
      * @param returnType 返回值的类
+     * @param headers    请求的头部
      * @return 返回值的类
      */
     <T> RestVo<T> put(String url, Object obj, Class<T> returnType, Map<String, Object> headers);
@@ -71,6 +73,7 @@ public interface ReqExt {
      *
      * @param url        请求url
      * @param returnType 返回值的类
+     * @param params     请求的参数
      * @param headers    请求头
      * @param <T>        返回值的类
      * @return 返回值的类
