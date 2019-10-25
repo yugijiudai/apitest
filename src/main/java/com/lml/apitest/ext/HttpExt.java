@@ -134,7 +134,6 @@ public class HttpExt implements ReqExt {
             execute = httpRequest.execute();
             log.debug("{}请求消耗了:{}ms", httpRequest.getUrl(), System.currentTimeMillis() - start);
             update.setRequestStatus(RequestStatusEnum.OK);
-            Integer.parseInt("fwew");
         }
         catch (Throwable e) {
             // 设置异常信息

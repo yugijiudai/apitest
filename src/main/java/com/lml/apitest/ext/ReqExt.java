@@ -31,7 +31,7 @@ public interface ReqExt {
 
 
     /**
-     * post方法,使用json格式来传参,后端需要用@requestBody来接受(自定义请求头)
+     * post方法,使用json格式来传参,后端需要用@requestBody来接受
      *
      * @param url        请求url
      * @param obj        post请求的参数
@@ -44,7 +44,7 @@ public interface ReqExt {
 
 
     /**
-     * get方法(没有请求头)
+     * get方法
      *
      * @param url        请求url
      * @param returnType 返回值的类
@@ -57,7 +57,7 @@ public interface ReqExt {
 
 
     /**
-     * put方法(有请求头)
+     * put方法
      *
      * @param url        请求url
      * @param obj        请求的内容
