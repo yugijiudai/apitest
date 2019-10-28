@@ -52,12 +52,7 @@ public class ApiClientUtil {
      * @param callBackLists 请求接口后需要执行的回调,是个list,可以自己定义然后回调的处理顺序
      */
     public void doApiRequest(JSONObject json, List<RequestCallBackHandler> callBackLists) {
-        // 将request的内容映射到对应的实体类里
-        RequestDto requestDto = JSONUtil.toBean(json.getStr(REQ_KEY), RequestDto.class);
-        MethodEnum method = MethodEnum.parese(requestDto.getMethod());
-        // 根据方法类型获取对应的请求处理器
-        RequestHandler handler = RequestHandlerFactory.getHandler(method);
-        RestVo<JSONObject> actual = handler.doHandle(requestDto);
+        RestVo<JSONObject> actual = doApiRequest(json);
         // 获取断言的数据
         String response = json.getStr(RES_KEY);
         JSONObject expectJson = JSONUtil.parseObj(response);
@@ -68,6 +63,21 @@ public class ApiClientUtil {
                 requestCallBackHandler.doCallBack(actual, expectJson);
             }
         }
+    }
+
+    /**
+     * 直接传加载好的脚本并且进行接口的请求
+     *
+     * @param json 加载好的脚本
+     * @return 返回请求后的数据
+     */
+    public RestVo<JSONObject> doApiRequest(JSONObject json) {
+        // 将request的内容映射到对应的实体类里
+        RequestDto requestDto = JSONUtil.toBean(json.getStr(REQ_KEY), RequestDto.class);
+        MethodEnum method = MethodEnum.parese(requestDto.getMethod());
+        // 根据方法类型获取对应的请求处理器
+        RequestHandler handler = RequestHandlerFactory.getHandler(method);
+        return handler.doHandle(requestDto);
     }
 
 
