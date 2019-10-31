@@ -4,7 +4,6 @@ import cn.hutool.json.JSONObject;
 import com.google.common.collect.Lists;
 import com.lml.apitest.BaseTest;
 import com.lml.apitest.handler.RequestCallBackHandler;
-import org.apache.commons.collections4.CollectionUtils;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -54,19 +53,8 @@ public class ApiClientUtilTest extends BaseTest {
             JSONObject result = actual.getResult();
             // 登录返回了一个随机值
             GlobalVariableUtil.setCache("${random}", result.getStr("data"));
-            List<String> cookies = actual.getHttpHeaders().get("Set-Cookie");
-            if (CollectionUtils.isEmpty(cookies)) {
-                return;
-            }
-            for (String cookie : cookies) {
-                String[] split = cookie.split(";");
-                for (String tmp : split) {
-                    String[] values = tmp.split("=");
-                    if (values[0].equals("JSESSIONID")) {
-                        GlobalVariableUtil.setCache("${sessionId}", values[1]);
-                    }
-                }
-            }
+            List<String> list = ApiClientUtil.getCookieByKey(actual.getHttpHeaders(), "JSESSIONID");
+            GlobalVariableUtil.setCache("${sessionId}", list.get(0));
         };
         // 先登录,然后回调中获取sessionId和登录时返回的随机字符串
         this.selfDoRequest("demo/userLogin.json", true, Lists.newArrayList(loginHandler));

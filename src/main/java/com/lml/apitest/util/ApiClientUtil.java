@@ -2,6 +2,7 @@ package com.lml.apitest.util;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.google.common.collect.Lists;
 import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.enums.MethodEnum;
 import com.lml.apitest.factory.RequestHandlerFactory;
@@ -11,6 +12,7 @@ import com.lml.apitest.vo.RestVo;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.http.HttpHeaders;
 
 import java.util.List;
 
@@ -32,6 +34,11 @@ public class ApiClientUtil {
      * 脚本response字段
      */
     private final String RES_KEY = "response";
+
+    /**
+     * 请求header的cookie字段
+     */
+    private final String COOKIE_KEY = "Set-Cookie";
 
 
     /**
@@ -81,4 +88,28 @@ public class ApiClientUtil {
     }
 
 
+    /**
+     * 根据给定的key值,从请求的头部获取对应的cookie值
+     *
+     * @param httpHeaders 请求头部
+     * @param key         cookie的key
+     * @return 符合这个cookie的key的值列表
+     */
+    public List<String> getCookieByKey(HttpHeaders httpHeaders, String key) {
+        List<String> cookiesVal = Lists.newArrayList();
+        List<String> cookies = httpHeaders.get(COOKIE_KEY);
+        if (CollectionUtils.isEmpty(cookies)) {
+            return cookiesVal;
+        }
+        for (String cookie : cookies) {
+            String[] split = cookie.split(";");
+            for (String tmp : split) {
+                String[] values = tmp.split("=");
+                if (values[0].equals(key)) {
+                    cookiesVal.add(values[1]);
+                }
+            }
+        }
+        return cookiesVal;
+    }
 }
