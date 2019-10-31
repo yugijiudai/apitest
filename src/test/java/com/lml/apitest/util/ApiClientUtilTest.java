@@ -53,7 +53,7 @@ public class ApiClientUtilTest extends BaseTest {
             JSONObject result = actual.getResult();
             // 登录返回了一个随机值
             GlobalVariableUtil.setCache("${random}", result.getStr("data"));
-            List<String> list = ApiClientUtil.getCookieByKey(actual.getHttpHeaders(), "JSESSIONID");
+            List<Object> list = ApiClientUtil.getCookieByKey(actual.getHttpHeaders(), "JSESSIONID");
             GlobalVariableUtil.setCache("${sessionId}", list.get(0));
         };
         // 先登录,然后回调中获取sessionId和登录时返回的随机字符串
