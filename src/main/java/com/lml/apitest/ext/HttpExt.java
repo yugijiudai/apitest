@@ -164,6 +164,10 @@ public class HttpExt implements ReqExt {
             Object val = header.getValue();
             if (HttpHeaders.COOKIE.equals(key)) {
                 post.header(HttpHeaders.COOKIE, getCookieList(val).toString());
+                // 这里要设置cookie,因为这个http请求框架不会把header的cookie当成是真的cookie
+                String cookie = toCookieList(val);
+                log.debug("要传输的cookies如下:{}", cookie);
+                post.cookie(cookie);
                 continue;
             }
             post.header(key, val.toString());

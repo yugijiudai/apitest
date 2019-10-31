@@ -97,4 +97,20 @@ public interface ReqExt {
         return cookieList;
     }
 
+    /**
+     * 获得cookie
+     *
+     * @param cookiesJsonArr cookie的json数组字符串
+     * @return 返回设置好的格式, 格式如下:"TITAN_SESSION_ID=sss; TITAN_ACCID=910
+     */
+    default String toCookieList(Object cookiesJsonArr) {
+        JSONArray array = JSONUtil.parseArray(cookiesJsonArr);
+        StringBuilder sb = new StringBuilder();
+        array.forEach(obj -> {
+            JSONObject tmp = (JSONObject) obj;
+            tmp.forEach((key, val) -> sb.append(key).append("=").append(val).append(";"));
+        });
+        return sb.substring(0, sb.length() - 1);
+    }
+
 }
