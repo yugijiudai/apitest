@@ -73,7 +73,7 @@ public class RequestTest {
         Map<String, Object> map = Maps.newHashMap();
         map.put("hello", "hello");
         map.put("okc", "okc");
-        JSONObject vo = reqAdapter.postForForm(reqUrl, reqUserDto, JSONObject.class, map).getResult();
+        JSONObject vo = reqAdapter.postForForm(reqUrl, reqUserDto, JSONObject.class, map, null).getResult();
         UserDto response = JSONUtil.toBean(vo.getStr("data"), UserDto.class);
         Assert.assertEquals(response.getName(), reqUserDto.getName());
         Assert.assertEquals(response.getPwd(), reqUserDto.getPwd());

@@ -38,4 +38,9 @@ public class RequestDto {
      */
     private boolean useRelativeUrl = true;
 
+    /**
+     * 上传的文件,如果有才需要填
+     */
+    private JSONObject file;
+
 }

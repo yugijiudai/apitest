@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +37,17 @@ public class TestController {
         System.out.println(req.getHeader("hello"));
         System.out.println(req.getHeader("okc"));
         return buildJsonSuccess(userDto);
+    }
+
+
+    @PostMapping(value = "/uploadFile")
+    public JSONObject uploadFile(MultipartFile[] uploadFile, String name) {
+        StringBuilder sb = new StringBuilder();
+        for (MultipartFile multipartFile : uploadFile) {
+            sb.append(multipartFile.getOriginalFilename()).append("-");
+        }
+        sb.append(name);
+        return buildSuccess(sb);
     }
 
     @PutMapping(value = "/put")

@@ -36,11 +36,12 @@ public class RestUtilExt implements ReqExt {
      * @param obj        post请求的参数
      * @param returnType 返回值的类
      * @param headers    请求头
+     * @param uploadFile 上传的文件
      * @param <T>        返回值的类
      * @return 返回值的类
      */
     @Override
-    public <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers) {
+    public <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers, Map<String, Object> uploadFile) {
         Map<String, Object> map = Maps.newHashMap();
         BeanUtil.copyProperties(obj, map);
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();

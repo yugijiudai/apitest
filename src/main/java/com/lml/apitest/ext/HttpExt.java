@@ -3,12 +3,17 @@ package com.lml.apitest.ext;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Maps;
 import com.lml.apitest.dto.RequestContentDto;
 import com.lml.apitest.enums.RequestStatusEnum;
+import com.lml.apitest.exception.InitException;
 import com.lml.apitest.exception.RequestException;
 import com.lml.apitest.po.RequestContent;
 import com.lml.apitest.service.RequestContentService;
@@ -19,9 +24,12 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author yugi
@@ -35,11 +43,13 @@ public class HttpExt implements ReqExt {
     private RequestContentService requestContentServiceImpl = new RequestContentServiceImpl();
 
     @Override
-    public <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers) {
+    public <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers, Map<String, Object> uploadFile) {
         HttpRequest post = HttpRequest.post(url);
         this.setRequestHeader(headers, post);
         Map<String, Object> map = Maps.newHashMap();
         BeanUtil.copyProperties(obj, map);
+        // 如果上传的文件不为空
+        post = this.handleUploadFile(uploadFile, post, map);
         HttpResponse execute = doFormRequest(post, headers, map);
         return afterReq(returnType, execute);
     }
@@ -212,6 +222,36 @@ public class HttpExt implements ReqExt {
         // 如果返回的内容是json格式,则把他转成对应的json对象类
         T result = JSONUtil.isJson(body) ? JSONUtil.toBean(body, returnType) : (T) body;
         return restVo.setHttpHeaders(resHeader).setResult(result);
+    }
+
+
+    /**
+     * 处理上传文件
+     *
+     * @param uploadFile 上传文件的参数
+     * @param post       请求参数
+     * @return {@link HttpRequest}
+     */
+    private HttpRequest handleUploadFile(Map<String, Object> uploadFile, HttpRequest post, Map<String, Object> map) {
+        if (uploadFile == null) {
+            return post;
+        }
+        if (uploadFile.keySet().size() != 1) {
+            throw new InitException("上传文件的格式不对!");
+        }
+        for (Map.Entry<String, Object> entry : uploadFile.entrySet()) {
+            JSONArray uploadFiles = JSONUtil.parseArray(entry.getValue());
+            // 获取所有的上传文件
+            List<File> files = uploadFiles.stream().map(fileName -> {
+                URL resource = ResourceUtil.getResource(fileName.toString());
+                return FileUtil.file(resource);
+            }).collect(Collectors.toList());
+            // 这里需要把list转成数组,因为参数是可变数组,不转会报错
+            post.form(entry.getKey(), ArrayUtil.toArray(files, File.class));
+        }
+        // 把上传文件的参数放在请求上面,用于记录到数据库,暂时没发现问题
+        map.putAll(uploadFile);
+        return post;
     }
 
 

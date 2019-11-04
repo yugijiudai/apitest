@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "postFromData",
+    "url": "/uploadFile",
+    "file": {
+      "uploadFile": [
+        "${file1}",
+        "${file2}"
+      ]
+    },
+    "param": {
+      "name": "okc"
+    },
+    "headers": {
+      "helloWorld": "the world!!!"
+    }
+  },
+  "response": {
+    "code": 200,
+    "data": "uploadFile.json-getUser.json-okc"
+  }
+}

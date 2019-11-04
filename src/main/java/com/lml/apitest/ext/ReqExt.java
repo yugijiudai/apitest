@@ -24,10 +24,11 @@ public interface ReqExt {
      * @param obj        post请求的参数
      * @param returnType 返回值的类
      * @param headers    请求头
+     * @param uploadFile 上传的文件
      * @param <T>        返回值的类
      * @return 返回值的类
      */
-    <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers);
+    <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers, Map<String, Object> uploadFile);
 
 
     /**

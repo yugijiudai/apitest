@@ -47,6 +47,17 @@ public class ApiClientUtilTest extends BaseTest {
         this.doRequest("demo/userDelete.json");
     }
 
+
+    @Test
+    public void uploadFileTest() {
+        String file1 = "demo/uploadFile.json";
+        String file2 = "demo/getUser.json";
+        GlobalVariableUtil.setCache("${file1}", file1);
+        GlobalVariableUtil.setCache("${file2}", file2);
+        this.doRequest(file1);
+    }
+
+
     @Test
     public void getUserTest() {
         RequestCallBackHandler loginHandler = (actual, ext) -> {

@@ -21,6 +21,6 @@ public class PostFormHandler implements RequestHandler {
     @Override
     public RestVo<JSONObject> handleRequest(RequestDto requestDto) {
         JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
-        return REQ_ADAPTER.postForForm(requestDto.getUrl(), reqObj, JSONObject.class, requestDto.getHeaders());
+        return REQ_ADAPTER.postForForm(requestDto.getUrl(), reqObj, JSONObject.class, requestDto.getHeaders(), requestDto.getFile());
     }
 }
