@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="demo模块自动化测试" parallel="false">
-    <test name="demo相关功能">
+<suite name="请求类测试" parallel="false">
+    <test name="ApiClientUtilTest">
         <classes>
-<!--            <class name="com.lml.apitest.DemoTest"/>-->
+            <class name="com.lml.apitest.util.ApiClientUtilTest"/>
+        </classes>
+    </test>
+    <test name="RequestTest">
+        <classes>
+            <class name="com.lml.apitest.util.RequestTest"/>
         </classes>
     </test>
 </suite>
