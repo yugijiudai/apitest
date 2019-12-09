@@ -219,9 +219,15 @@ public class HttpExt implements ReqExt {
         RestVo<T> restVo = new RestVo<>();
         String body = execute.body();
         HttpHeaders resHeader = this.setResponseHeader(execute);
+        restVo.setHttpHeaders(resHeader);
         // 如果返回的内容是json格式,则把他转成对应的json对象类
-        T result = JSONUtil.isJson(body) ? JSONUtil.toBean(body, returnType) : (T) body;
-        return restVo.setHttpHeaders(resHeader).setResult(result);
+        if (!JSONUtil.isJson(body)) {
+            return restVo.setResult((T) body);
+        }
+        if (JSONUtil.isJsonArray(body)) {
+            return restVo.setResult((T) JSONUtil.parseArray(body));
+        }
+        return restVo.setResult(JSONUtil.toBean(body, returnType));
     }
 
 
