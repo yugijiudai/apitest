@@ -46,7 +46,6 @@ public class HttpExt implements ReqExt {
     @Override
     public <T> RestVo<T> postForForm(RequestDto requestDto, Class<T> returnType) {
         HttpRequest post = HttpRequest.post(requestDto.getUrl());
-        JSONObject headers = requestDto.getHeaders();
         // this.setRequestHeader(headers, post);
         JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
         // 处理上传文件,这里会改变reqObj,所以要重新设置到param里
@@ -238,7 +237,8 @@ public class HttpExt implements ReqExt {
      * 处理上传文件
      *
      * @param uploadFile 上传文件的参数
-     * @param post       请求参数
+     * @param post       {@link HttpRequest}
+     * @param map        请求参数
      * @return {@link HttpRequest}
      */
     private HttpRequest handleUploadFile(Map<String, Object> uploadFile, HttpRequest post, Map<String, Object> map) {

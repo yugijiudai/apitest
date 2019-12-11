@@ -1,12 +1,17 @@
 package com.lml.apitest.ext;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.lml.apitest.dto.RequestDto;
+import com.lml.apitest.exception.InitException;
 import com.lml.apitest.vo.RestVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,6 +20,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -45,8 +51,8 @@ public class RestUtilExt implements ReqExt {
         for (Map.Entry<String, Object> entry : reqObj.entrySet()) {
             formData.add(entry.getKey(), entry.getValue());
         }
-        requestDto.setParam(JSONUtil.toJsonStr(formData));
-        return requestForm(requestDto, HttpMethod.POST, returnType);
+        formData = handleUploadFile(requestDto.getFile(), formData);
+        return requestForm(requestDto, HttpMethod.POST, returnType, formData);
     }
 
 
@@ -74,7 +80,7 @@ public class RestUtilExt implements ReqExt {
      */
     @Override
     public <T> RestVo<T> get(RequestDto requestDto, Class<T> returnType) {
-        return requestForm(requestDto, HttpMethod.GET, returnType);
+        return requestForm(requestDto, HttpMethod.GET, returnType, null);
     }
 
 
@@ -101,7 +107,7 @@ public class RestUtilExt implements ReqExt {
      */
     @Override
     public <T> RestVo<T> delete(RequestDto requestDto, Class<T> returnType) {
-        return requestForm(requestDto, HttpMethod.DELETE, returnType);
+        return requestForm(requestDto, HttpMethod.DELETE, returnType, null);
     }
 
 
@@ -126,18 +132,19 @@ public class RestUtilExt implements ReqExt {
      * @param requestDto {@link RequestDto}
      * @param method     请求方法
      * @param returnType 返回的类型
+     * @param param      postForm才需要使用,get和delete都是null
      */
-    private <T> RestVo<T> requestForm(RequestDto requestDto, HttpMethod method, Class<T> returnType) {
+    private <T> RestVo<T> requestForm(RequestDto requestDto, HttpMethod method, Class<T> returnType, Object param) {
         String url = requestDto.getUrl();
         //获取header信息
         HttpHeaders requestHeaders = buildHttpHeaders(requestDto.getHeaders());
         JSONObject params = JSONUtil.parseObj(requestDto.getParam());
         // 发送请求参数
-        if (MapUtils.isNotEmpty(params)) {
+        if (!HttpMethod.POST.equals(method) && MapUtils.isNotEmpty(params)) {
             url = HttpUtil.urlWithForm(url, params, StandardCharsets.UTF_8, true);
             log.info("请求参数:{}", url);
         }
-        HttpEntity<Object> requestEntity = new HttpEntity<>(null, requestHeaders);
+        HttpEntity<Object> requestEntity = new HttpEntity<>(param, requestHeaders);
         return handleRequest(url, method, returnType, requestEntity);
     }
 
@@ -185,6 +192,32 @@ public class RestUtilExt implements ReqExt {
         }
         log.debug("要传输的headers如下:{}", headers);
         return requestHeaders;
+    }
+
+    /**
+     * 处理上传文件
+     *
+     * @param uploadFile 需要上传的文件
+     * @param map        上传的参数
+     * @return 返回新的上传参数
+     */
+    private MultiValueMap<String, Object> handleUploadFile(Map<String, Object> uploadFile, MultiValueMap<String, Object> map) {
+        if (uploadFile == null) {
+            return map;
+        }
+        if (uploadFile.keySet().size() != 1) {
+            throw new InitException("上传文件的格式不对!");
+        }
+        for (Map.Entry<String, Object> entry : uploadFile.entrySet()) {
+            JSONArray uploadFiles = JSONUtil.parseArray(entry.getValue());
+            // 获取所有的上传文件
+            uploadFiles.forEach(fileName -> {
+                URL resource = ResourceUtil.getResource(fileName.toString());
+                FileSystemResource fileSystemResource = new FileSystemResource(FileUtil.file(resource));
+                map.add(entry.getKey(), fileSystemResource);
+            });
+        }
+        return map;
     }
 
 
