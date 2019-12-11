@@ -23,6 +23,11 @@ public class RequestContent {
     private Integer id;
 
     /**
+     * 接口的名字
+     */
+    private String name;
+
+    /**
      * 请求的方法
      */
     private Method method;

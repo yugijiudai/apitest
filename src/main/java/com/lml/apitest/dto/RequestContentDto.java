@@ -23,6 +23,11 @@ public class RequestContentDto {
     private String url;
 
     /**
+     * 接口的名字
+     */
+    private String name;
+
+    /**
      * 请求头
      */
     private Map<String, Object> headers;

@@ -1,6 +1,7 @@
 {
   "request": {
     "method": "post",
+    "name": "登录接口",
     "url": "/login",
     "param": {
       "name": "lml"

@@ -2,6 +2,7 @@
   "request": {
     "method": "get",
     "url": "/getUser",
+    "name": "获取用户信息",
     "param": {
       "name": "${username}"
     },

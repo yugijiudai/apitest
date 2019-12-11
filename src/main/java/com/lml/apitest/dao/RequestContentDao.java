@@ -32,7 +32,7 @@ public class RequestContentDao {
 
     private static final String TABLE = "request_content";
 
-    private static final String SELECT = "select rc.id, rc.method, rc.start_time, rc.end_time, rc.headers, rc.request_status, rc.content, rc.url, rc.exception_msg";
+    private static final String SELECT = "select rc.id, rc.name, rc.method, rc.start_time, rc.end_time, rc.headers, rc.request_status, rc.content, rc.url, rc.exception_msg";
 
 
     /**
@@ -44,6 +44,7 @@ public class RequestContentDao {
         try {
 
             Entity entity = Entity.create(TABLE)
+                    .set("name", requestContent.getName())
                     .set("method", requestContent.getMethod().name())
                     .set("start_time", requestContent.getStartTime())
                     .set("url", requestContent.getUrl());
@@ -113,6 +114,7 @@ public class RequestContentDao {
     private RequestContent transToRequestContent(Entity entity) {
         RequestContent requestContent = new RequestContent();
         requestContent.setId(entity.getInt("id"));
+        requestContent.setName(entity.getStr("name"));
         requestContent.setMethod(Method.valueOf(entity.getStr("method")));
         requestContent.setStartTime(entity.getDate("start_time"));
         requestContent.setEndTime(entity.getDate("end_time"));

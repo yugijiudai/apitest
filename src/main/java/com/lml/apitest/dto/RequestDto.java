@@ -19,6 +19,11 @@ public class RequestDto {
     private String method;
 
     /**
+     * 接口名字
+     */
+    private String name;
+
+    /**
      * 请求参数
      */
     private String param;
