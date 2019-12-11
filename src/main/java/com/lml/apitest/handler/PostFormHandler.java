@@ -1,7 +1,6 @@
 package com.lml.apitest.handler;
 
 import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.enums.MethodEnum;
 import com.lml.apitest.vo.RestVo;
@@ -20,7 +19,6 @@ public class PostFormHandler implements RequestHandler {
 
     @Override
     public RestVo<JSONObject> handleRequest(RequestDto requestDto) {
-        JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
-        return REQ_ADAPTER.postForForm(requestDto.getUrl(), reqObj, JSONObject.class, requestDto.getHeaders(), requestDto.getFile());
+        return REQ_ADAPTER.postForForm(requestDto, JSONObject.class);
     }
 }

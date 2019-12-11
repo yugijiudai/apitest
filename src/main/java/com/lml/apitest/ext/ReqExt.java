@@ -4,10 +4,10 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
+import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.vo.RestVo;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author yugi
@@ -20,66 +20,55 @@ public interface ReqExt {
     /**
      * post方法,使用formData格式来传参
      *
-     * @param url        请求url
-     * @param obj        post请求的参数
+     * @param requestDto {@link RequestDto}
      * @param returnType 返回值的类
-     * @param headers    请求头
-     * @param uploadFile 上传的文件
      * @param <T>        返回值的类
      * @return 返回值的类
      */
-    <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers, Map<String, Object> uploadFile);
+    <T> RestVo<T> postForForm(RequestDto requestDto, Class<T> returnType);
 
 
     /**
      * post方法,使用json格式来传参,后端需要用@requestBody来接受
      *
-     * @param url        请求url
-     * @param obj        post请求的参数
+     * @param requestDto {@link RequestDto}
      * @param returnType 返回值的类
-     * @param headers    请求头
      * @param <T>        返回值的类
      * @return 返回值的类
      */
-    <T> RestVo<T> post(String url, Object obj, Class<T> returnType, Map<String, Object> headers);
+    <T> RestVo<T> post(RequestDto requestDto, Class<T> returnType);
 
 
     /**
      * get方法
      *
-     * @param url        请求url
+     * @param requestDto {@link RequestDto}
      * @param returnType 返回值的类
-     * @param params     请求的参数
-     * @param headers    请求头
      * @param <T>        返回值的类
      * @return 返回值的类
      */
-    <T> RestVo<T> get(String url, Class<T> returnType, Map<String, Object> params, Map<String, Object> headers);
+    <T> RestVo<T> get(RequestDto requestDto, Class<T> returnType);
 
 
     /**
      * put方法
      *
-     * @param url        请求url
-     * @param obj        请求的内容
+     * @param requestDto {@link RequestDto}
      * @param returnType 返回值的类
-     * @param headers    请求的头部
      * @return 返回值的类
      */
-    <T> RestVo<T> put(String url, Object obj, Class<T> returnType, Map<String, Object> headers);
+    <T> RestVo<T> put(RequestDto requestDto, Class<T> returnType);
 
 
     /**
      * delete方法
      *
-     * @param url        请求url
+     * @param requestDto {@link RequestDto}
      * @param returnType 返回值的类
-     * @param params     请求的参数
-     * @param headers    请求头
      * @param <T>        返回值的类
      * @return 返回值的类
      */
-    <T> RestVo<T> delete(String url, Class<T> returnType, Map<String, Object> params, Map<String, Object> headers);
+    <T> RestVo<T> delete(RequestDto requestDto, Class<T> returnType);
 
 
     /**

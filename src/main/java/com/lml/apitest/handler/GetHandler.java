@@ -1,10 +1,8 @@
 package com.lml.apitest.handler;
 
 import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.enums.MethodEnum;
-import com.lml.apitest.ext.ReqAdapter;
 import com.lml.apitest.vo.RestVo;
 
 /**
@@ -21,8 +19,7 @@ public class GetHandler implements RequestHandler {
 
     @Override
     public RestVo<JSONObject> handleRequest(RequestDto requestDto) {
-        JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
-        return REQ_ADAPTER.get(requestDto.getUrl(), JSONObject.class, reqObj, requestDto.getHeaders());
+        return REQ_ADAPTER.get(requestDto, JSONObject.class);
     }
 
 }

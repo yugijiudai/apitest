@@ -1,8 +1,9 @@
 package com.lml.apitest.ext;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpUtil;
-import com.google.common.collect.Maps;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.vo.RestVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -32,113 +33,105 @@ public class RestUtilExt implements ReqExt {
     /**
      * post方法,使用formData格式来传参(自定义请求头)
      *
-     * @param url        请求url
-     * @param obj        post请求的参数
+     * @param requestDto {@link RequestDto}
      * @param returnType 返回值的类
-     * @param headers    请求头
-     * @param uploadFile 上传的文件
      * @param <T>        返回值的类
      * @return 返回值的类
      */
     @Override
-    public <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers, Map<String, Object> uploadFile) {
-        Map<String, Object> map = Maps.newHashMap();
-        BeanUtil.copyProperties(obj, map);
+    public <T> RestVo<T> postForForm(RequestDto requestDto, Class<T> returnType) {
+        JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
+        for (Map.Entry<String, Object> entry : reqObj.entrySet()) {
             formData.add(entry.getKey(), entry.getValue());
         }
-        return request(url, HttpMethod.POST, formData, returnType, headers);
+        requestDto.setParam(JSONUtil.toJsonStr(formData));
+        return requestForm(requestDto, HttpMethod.POST, returnType);
     }
 
 
     /**
      * post方法,使用json格式来传参,后端需要用@requestBody来接受(自定义请求头)
      *
-     * @param url        请求url
-     * @param obj        post请求的参数
+     * @param requestDto {@link RequestDto}
      * @param returnType 返回值的类
-     * @param headers    请求头
      * @param <T>        返回值的类
      * @return 返回值的类
      */
     @Override
-    public <T> RestVo<T> post(String url, Object obj, Class<T> returnType, Map<String, Object> headers) {
-        return request(url, HttpMethod.POST, obj, returnType, headers);
+    public <T> RestVo<T> post(RequestDto requestDto, Class<T> returnType) {
+        return requestJson(requestDto, HttpMethod.POST, returnType);
     }
 
 
     /**
      * get方法(没有请求头)
      *
-     * @param url        请求url
+     * @param requestDto {@link RequestDto}
      * @param returnType 返回值的类
-     * @param params     请求的参数
-     * @param headers    请求头
      * @param <T>        返回值的类
      * @return 返回值的类
      */
     @Override
-    public <T> RestVo<T> get(String url, Class<T> returnType, Map<String, Object> params, Map<String, Object> headers) {
-        return request(url, HttpMethod.GET, params, returnType, headers);
+    public <T> RestVo<T> get(RequestDto requestDto, Class<T> returnType) {
+        return requestForm(requestDto, HttpMethod.GET, returnType);
     }
 
 
     /**
      * put方法(有请求头)
      *
-     * @param url        请求url
+     * @param requestDto {@link RequestDto}
      * @param returnType 返回值的类
      * @return 返回值的类
      */
     @Override
-    public <T> RestVo<T> put(String url, Object obj, Class<T> returnType, Map<String, Object> headers) {
-        return request(url, HttpMethod.PUT, obj, returnType, headers);
+    public <T> RestVo<T> put(RequestDto requestDto, Class<T> returnType) {
+        return requestJson(requestDto, HttpMethod.PUT, returnType);
     }
 
 
     /**
      * delete方法
      *
-     * @param url        请求url
+     * @param requestDto {@link RequestDto}
      * @param returnType 返回值的类
-     * @param headers    请求头
      * @param <T>        返回值的类
      * @return 返回值的类
      */
     @Override
-    public <T> RestVo<T> delete(String url, Class<T> returnType, Map<String, Object> params, Map<String, Object> headers) {
-        return request(url, HttpMethod.DELETE, params, returnType, headers);
+    public <T> RestVo<T> delete(RequestDto requestDto, Class<T> returnType) {
+        return requestForm(requestDto, HttpMethod.DELETE, returnType);
     }
 
 
     /**
-     * 发送请求(post,put调用)
+     * 发送请求(json类型的参数使用)
      *
-     * @param url        要请求的url
+     * @param requestDto {@link RequestDto}
      * @param method     请求方法
      * @param returnType 返回的类型
-     * @param headers    要设置的头部
      */
-    private <T> RestVo<T> request(String url, HttpMethod method, Object obj, Class<T> returnType, Map<String, Object> headers) {
+    private <T> RestVo<T> requestJson(RequestDto requestDto, HttpMethod method, Class<T> returnType) {
         //获取header信息
-        HttpHeaders requestHeaders = buildHttpHeaders(headers);
+        HttpHeaders requestHeaders = buildHttpHeaders(requestDto.getHeaders());
+        JSONObject obj = JSONUtil.parseObj(requestDto.getParam());
         HttpEntity<Object> requestEntity = new HttpEntity<>(obj, requestHeaders);
-        return handleRequest(url, method, returnType, requestEntity);
+        return handleRequest(requestDto.getUrl(), method, returnType, requestEntity);
     }
 
     /**
-     * 发送请求(get,delete调用)
+     * 发送请求(form类型的参数使用)
      *
-     * @param url        要请求的url
+     * @param requestDto {@link RequestDto}
      * @param method     请求方法
-     * @param params     请求的参数(会拼接到url上)
      * @param returnType 返回的类型
-     * @param headers    要设置的头部
      */
-    private <T> RestVo<T> request(String url, HttpMethod method, Map<String, Object> params, Class<T> returnType, Map<String, Object> headers) {
+    private <T> RestVo<T> requestForm(RequestDto requestDto, HttpMethod method, Class<T> returnType) {
+        String url = requestDto.getUrl();
         //获取header信息
-        HttpHeaders requestHeaders = buildHttpHeaders(headers);
+        HttpHeaders requestHeaders = buildHttpHeaders(requestDto.getHeaders());
+        JSONObject params = JSONUtil.parseObj(requestDto.getParam());
         // 发送请求参数
         if (MapUtils.isNotEmpty(params)) {
             url = HttpUtil.urlWithForm(url, params, StandardCharsets.UTF_8, true);

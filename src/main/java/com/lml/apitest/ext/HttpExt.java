@@ -1,6 +1,5 @@
 package com.lml.apitest.ext;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.io.FileUtil;
@@ -9,9 +8,11 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Maps;
 import com.lml.apitest.dto.RequestContentDto;
+import com.lml.apitest.dto.RequestDto;
 import com.lml.apitest.enums.RequestStatusEnum;
 import com.lml.apitest.exception.InitException;
 import com.lml.apitest.exception.RequestException;
@@ -43,87 +44,89 @@ public class HttpExt implements ReqExt {
     private RequestContentService requestContentServiceImpl = new RequestContentServiceImpl();
 
     @Override
-    public <T> RestVo<T> postForForm(String url, Object obj, Class<T> returnType, Map<String, Object> headers, Map<String, Object> uploadFile) {
-        HttpRequest post = HttpRequest.post(url);
-        this.setRequestHeader(headers, post);
-        Map<String, Object> map = Maps.newHashMap();
-        BeanUtil.copyProperties(obj, map);
-        // 如果上传的文件不为空
-        post = this.handleUploadFile(uploadFile, post, map);
-        HttpResponse execute = doFormRequest(post, headers, map);
+    public <T> RestVo<T> postForForm(RequestDto requestDto, Class<T> returnType) {
+        HttpRequest post = HttpRequest.post(requestDto.getUrl());
+        JSONObject headers = requestDto.getHeaders();
+        // this.setRequestHeader(headers, post);
+        JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
+        // 处理上传文件,这里会改变reqObj,所以要重新设置到param里
+        post = this.handleUploadFile(requestDto.getFile(), post, reqObj);
+        requestDto.setParam(JSONUtil.toJsonStr(reqObj));
+        HttpResponse execute = doFormRequest(post, requestDto);
         return afterReq(returnType, execute);
     }
 
 
     @Override
-    public <T> RestVo<T> post(String url, Object obj, Class<T> returnType, Map<String, Object> headers) {
-        HttpRequest post = HttpRequest.post(url);
-        HttpResponse execute = doJsonRequest(post, headers, obj);
+    public <T> RestVo<T> post(RequestDto requestDto, Class<T> returnType) {
+        HttpRequest post = HttpRequest.post(requestDto.getUrl());
+        HttpResponse execute = doJsonRequest(post, requestDto);
         return afterReq(returnType, execute);
     }
 
 
     @Override
-    public <T> RestVo<T> get(String url, Class<T> returnType, Map<String, Object> params, Map<String, Object> headers) {
-        HttpRequest get = HttpRequest.get(url);
-        HttpResponse execute = doFormRequest(get, headers, params);
+    public <T> RestVo<T> get(RequestDto requestDto, Class<T> returnType) {
+        HttpRequest get = HttpRequest.get(requestDto.getUrl());
+        HttpResponse execute = doFormRequest(get, requestDto);
         return afterReq(returnType, execute);
     }
 
     @Override
-    public <T> RestVo<T> put(String url, Object obj, Class<T> returnType, Map<String, Object> headers) {
-        HttpRequest put = HttpRequest.put(url);
-        HttpResponse execute = doJsonRequest(put, headers, obj);
+    public <T> RestVo<T> put(RequestDto requestDto, Class<T> returnType) {
+        HttpRequest put = HttpRequest.put(requestDto.getUrl());
+        HttpResponse execute = doJsonRequest(put, requestDto);
         return afterReq(returnType, execute);
     }
 
     @Override
-    public <T> RestVo<T> delete(String url, Class<T> returnType, Map<String, Object> params, Map<String, Object> headers) {
-        HttpRequest delete = HttpRequest.delete(url);
-        HttpResponse execute = doFormRequest(delete, headers, params);
+    public <T> RestVo<T> delete(RequestDto requestDto, Class<T> returnType) {
+        HttpRequest delete = HttpRequest.delete(requestDto.getUrl());
+        HttpResponse execute = doFormRequest(delete, requestDto);
         return afterReq(returnType, execute);
     }
 
     /**
      * 使用form方式提交
      *
-     * @param req     {@link HttpRequest}
-     * @param headers 对应的头部
-     * @param params  请求的参数
+     * @param req        {@link HttpRequest}
+     * @param requestDto {@link RequestDto}
      * @return {@link HttpResponse}
      */
-    private HttpResponse doFormRequest(HttpRequest req, Map<String, Object> headers, Map<String, Object> params) {
+    private HttpResponse doFormRequest(HttpRequest req, RequestDto requestDto) {
+        JSONObject headers = requestDto.getHeaders();
         this.setRequestHeader(headers, req);
-        RequestContentDto requestContentDto = buildRequestContentDtoCommon(params, headers, req);
+        JSONObject params = JSONUtil.parseObj(requestDto.getParam());
+        RequestContentDto requestContentDto = buildRequestContentDtoCommon(requestDto, req);
         return exe(req.form(params), requestContentDto);
     }
+
 
     /**
      * 使用json方式提交
      *
-     * @param req     {@link HttpRequest}
-     * @param headers 对应的头部
-     * @param obj     请求的参数
+     * @param req        {@link HttpRequest}
+     * @param requestDto {@link RequestDto}
      * @return {@link HttpResponse}
      */
-    private HttpResponse doJsonRequest(HttpRequest req, Map<String, Object> headers, Object obj) {
-        this.setRequestHeader(headers, req);
-        String content = JSONUtil.toJsonStr(obj);
-        RequestContentDto requestContentDto = buildRequestContentDtoCommon(obj, headers, req);
+    private HttpResponse doJsonRequest(HttpRequest req, RequestDto requestDto) {
+        this.setRequestHeader(requestDto.getHeaders(), req);
+        JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
+        String content = JSONUtil.toJsonStr(reqObj);
+        RequestContentDto requestContentDto = buildRequestContentDtoCommon(requestDto, req);
         return exe(req.body(content), requestContentDto);
     }
 
     /**
      * 构建公共的头部,内容,方法,url等公共参数
      *
-     * @param content     请求的内容
-     * @param headers     请求的头部
+     * @param requestDto  {@link RequestDto}
      * @param httpRequest 请求的对象
      * @return 返回构造好的dto
      */
-    private RequestContentDto buildRequestContentDtoCommon(Object content, Map<String, Object> headers, HttpRequest httpRequest) {
+    private RequestContentDto buildRequestContentDtoCommon(RequestDto requestDto, HttpRequest httpRequest) {
         RequestContentDto requestContentDto = new RequestContentDto();
-        return requestContentDto.setContent(JSONUtil.toJsonStr(content)).setHeaders(headers).setUrl(httpRequest.getUrl()).setMethod(httpRequest.getMethod());
+        return requestContentDto.setContent(requestDto.getParam()).setName(requestDto.getName()).setHeaders(requestDto.getHeaders()).setUrl(httpRequest.getUrl()).setMethod(httpRequest.getMethod());
     }
 
     /**
