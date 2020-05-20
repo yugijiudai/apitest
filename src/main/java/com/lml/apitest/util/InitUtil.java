@@ -41,6 +41,11 @@ public class InitUtil {
      */
     private final String REGEX = "\\$\\{(.*?)}";
 
+    /**
+     * "#{XXX}"的正则匹配
+     */
+    private final String ARR_REGEX = "\"\\#\\{(.*?)}\"";
+
     static {
         initRequestHandle();
     }
@@ -76,7 +81,7 @@ public class InitUtil {
      * @param fileName 脚本的名字
      * @return 返回读取的脚本
      */
-    private String loadScript(String fileName) {
+    public String loadScript(String fileName) {
         URL resource = ResourceUtil.getResource(fileName);
         if (resource == null) {
             throw new InitException("找不到要加载的脚本 " + fileName);
@@ -135,11 +140,46 @@ public class InitUtil {
      */
     private String formatVariable(String script) {
         log.debug("原始脚本是:{}", JSONUtil.parse(script).toString());
+        script = formatNormalVariable(script);
+        script = formatArrayVariable(script);
+        log.debug("替换后的脚本是:{}", JSONUtil.parse(script).toString());
+        return script;
+    }
+
+    /**
+     * 格式化普通类型的变量
+     *
+     * @param script 加载的脚本
+     * @return 把${xxx}替换成对应的变量
+     */
+    private String formatNormalVariable(String script) {
         List<String> all = ReUtil.findAll(REGEX, script, 0);
         for (String match : all) {
             script = script.replace(match, GlobalVariableUtil.getCache(match).toString());
         }
-        log.debug("替换后的脚本是:{}", JSONUtil.parse(script).toString());
         return script;
     }
+
+    /**
+     * 格式化数组类型的变量
+     *
+     * @param script 加载的脚本
+     * @return 把#{xxx}转成["a", "b"]这种形式,并且替换对应的变量
+     */
+    @SuppressWarnings("unchecked")
+    private String formatArrayVariable(String script) {
+        List<String> arrAll = ReUtil.findAll(ARR_REGEX, script, 0);
+        for (String match : arrAll) {
+            // 匹配"#{xxx}",所以要截取第一个和最后一个双引号即#{xxx}
+            String cacheKey = match.substring(1, match.length() - 1);
+            List<String> cache = (List<String>) GlobalVariableUtil.getCache(cacheKey);
+            StringBuilder arrayString = new StringBuilder("[");
+            for (String tmp : cache) {
+                arrayString.append("\"").append(tmp).append("\"").append(",");
+            }
+            script = script.replace(match, arrayString.substring(0, arrayString.length() - 1) + "]");
+        }
+        return script;
+    }
+
 }

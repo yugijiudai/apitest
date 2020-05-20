@@ -6,9 +6,4 @@
             <class name="com.lml.apitest.util.ApiClientUtilTest"/>
         </classes>
     </test>
-    <test name="RequestTest">
-        <classes>
-            <class name="com.lml.apitest.util.RequestTest"/>
-        </classes>
-    </test>
 </suite>
