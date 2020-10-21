@@ -37,4 +37,9 @@ public class SettingDto {
      */
     private String reqExt;
 
+    /**
+     * 自定义要加载的数据源池
+     */
+    private String dataSourcePool;
+
 }

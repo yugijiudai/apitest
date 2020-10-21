@@ -124,7 +124,7 @@ public class InitUtil {
      * @return {@link SettingDto}
      */
     private SettingDto loadSetting() {
-        Properties prop = Props.getProp("application.properties");
+        Properties prop = Props.getProp("lml.properties");
         //获取key对应的value值
         SettingDto settingDto = new SettingDto();
         BeanUtil.copyProperties(prop, settingDto);

@@ -53,8 +53,9 @@ public class RequestHandlerFactory {
      * @param classes  要初始化的类的列表
      * @param consumer 强转后的回调函数
      */
-    private void setHandler(Set<Class<?>> classes, Consumer<RequestHandler> consumer) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    private void setHandler(Set<Class<?>> classes, Consumer<RequestHandler> consumer) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException {
         for (Class<?> clz : classes) {
+            // Class<?> aClass = ClassUtil.getClassLoader().loadClass(clz.getName());
             RequestHandler eh = (RequestHandler) clz.getDeclaredConstructor().newInstance();
             consumer.accept(eh);
             log.debug("初始化{},成功", eh);

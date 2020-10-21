@@ -46,7 +46,7 @@ public enum MethodEnum {
         this.method = method;
     }
 
-    public static MethodEnum parese(String method) {
+    public static MethodEnum parse(String method) {
         MethodEnum[] values = MethodEnum.values();
         for (MethodEnum value : values) {
             if (value.getMethod().equals(method)) {

@@ -77,13 +77,24 @@ public class ApiClientUtil {
     /**
      * 直接传加载好的脚本并且进行接口的请求
      *
+     * @param script 加载好的脚本的路径
+     * @return 返回请求后的数据
+     */
+    public RestVo<JSONObject> doApiRequest(String script) {
+        JSONObject json = InitUtil.loadReqContent(script);
+        return doApiRequest(json);
+    }
+
+    /**
+     * 直接传加载好的脚本并且进行接口的请求
+     *
      * @param json 加载好的脚本
      * @return 返回请求后的数据
      */
     public RestVo<JSONObject> doApiRequest(JSONObject json) {
         // 将request的内容映射到对应的实体类里
         RequestDto requestDto = JSONUtil.toBean(json.getStr(REQ_KEY), RequestDto.class);
-        MethodEnum method = MethodEnum.parese(requestDto.getMethod());
+        MethodEnum method = MethodEnum.parse(requestDto.getMethod());
         // 根据方法类型获取对应的请求处理器
         RequestHandler handler = RequestHandlerFactory.getHandler(method);
         return handler.doHandle(requestDto);
