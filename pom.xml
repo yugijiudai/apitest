@@ -25,7 +25,7 @@
     <description>api测试</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>13</java.version>
         <testNg.version>6.14.3</testNg.version>
         <api-core.version.version>0.0.1-SNAPSHOT</api-core.version.version>
         <api-web.version.version>0.0.1-SNAPSHOT</api-web.version.version>
