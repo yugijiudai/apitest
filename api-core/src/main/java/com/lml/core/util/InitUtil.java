@@ -138,7 +138,7 @@ public class InitUtil {
      * @param script 加载好的脚本
      * @return 返回替换好的占位符
      */
-    private String formatVariable(String script) {
+    public String formatVariable(String script) {
         log.debug("原始脚本是:{}", JSONUtil.parse(script).toString());
         script = formatNormalVariable(script);
         script = formatArrayVariable(script);
