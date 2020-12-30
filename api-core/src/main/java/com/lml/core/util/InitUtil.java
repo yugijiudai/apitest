@@ -46,6 +46,12 @@ public class InitUtil {
      */
     private final String ARR_REGEX = "\"\\#\\{(.*?)}\"";
 
+
+    /**
+     * ?{XXX}的正则匹配
+     */
+    private final String DYNAMIC_REGEX = "\\?\\{(.*?)}";
+
     static {
         initRequestHandle();
     }
@@ -139,10 +145,11 @@ public class InitUtil {
      * @return 返回替换好的占位符
      */
     public String formatVariable(String script) {
-        log.debug("原始脚本是:{}", JSONUtil.parse(script).toString());
+        log.debug("原始脚本是:{}", script);
         script = formatNormalVariable(script);
         script = formatArrayVariable(script);
-        log.debug("替换后的脚本是:{}", JSONUtil.parse(script).toString());
+        script = formatDynamicVariable(script);
+        log.debug("替换后的脚本是:{}", script);
         return script;
     }
 
@@ -181,5 +188,23 @@ public class InitUtil {
         }
         return script;
     }
+
+    /**
+     * 格式化动态变量
+     *
+     * @param script 加载的脚本
+     * @return 把?{xxx}替换成对应的内容
+     */
+    private String formatDynamicVariable(String script) {
+        // 匹配""?{xxx}""这种
+        List<String> all = ReUtil.findAll("\"" + DYNAMIC_REGEX + "\"", script, 0);
+        for (String match : all) {
+            // 截取前面和后面的双引号,变成"?{xxx}"这种
+            String cacheKey = match.substring(1, match.length() - 1);
+            script = script.replace(match, GlobalVariableUtil.getCache(cacheKey).toString());
+        }
+        return script;
+    }
+
 
 }
