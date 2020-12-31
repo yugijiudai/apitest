@@ -145,6 +145,7 @@ public class InitUtil {
      * @return 返回替换好的占位符
      */
     public String formatVariable(String script) {
+        script = JSONUtil.parseObj(script).toString();
         log.debug("原始脚本是:{}", script);
         script = formatNormalVariable(script);
         script = formatArrayVariable(script);
