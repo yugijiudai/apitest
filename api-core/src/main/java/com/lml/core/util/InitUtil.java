@@ -15,6 +15,9 @@ import com.lml.core.ext.ReqAdapter;
 import com.lml.core.ext.ReqExt;
 import com.lml.core.factory.RequestHandlerFactory;
 import com.lml.core.handler.RequestHandler;
+import com.lml.core.service.RequestContentService;
+import com.lml.core.service.RequestContentServiceImpl;
+import com.lml.core.service.RequestSubject;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -52,8 +55,15 @@ public class InitUtil {
      */
     private final String DYNAMIC_REGEX = "\\?\\{(.*?)}";
 
+    /**
+     * 请求的观察者
+     */
+    @Getter
+    private RequestSubject requestSubject = new RequestSubject();
+
     static {
         initRequestHandle();
+        initDefaultRequestContent();
     }
 
     /**
@@ -152,6 +162,15 @@ public class InitUtil {
         script = formatDynamicVariable(script);
         log.debug("替换后的脚本是:{}", script);
         return script;
+    }
+
+
+    /**
+     * 初始化默认的请求处理器
+     */
+    public void initDefaultRequestContent() {
+        RequestContentService requestContentServiceImpl = new RequestContentServiceImpl();
+        requestSubject.add(requestContentServiceImpl);
     }
 
     /**

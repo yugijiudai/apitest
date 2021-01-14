@@ -14,9 +14,9 @@ public interface RequestContentService {
      * 请求前做的处理
      *
      * @param requestContentDto {@link RequestContentDto}
-     * @return RequestContent 插入后的对象
      */
-    RequestContent beforeRequest(RequestContentDto requestContentDto);
+    void beforeRequest(RequestContentDto requestContentDto);
+
 
     /**
      * 请求后做的处理

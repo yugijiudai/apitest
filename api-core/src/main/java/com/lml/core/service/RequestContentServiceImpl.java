@@ -15,10 +15,10 @@ public class RequestContentServiceImpl implements RequestContentService {
     private RequestContentDao requestContentDao = new RequestContentDao();
 
     @Override
-    public RequestContent beforeRequest(RequestContentDto requestContentDto) {
+    public void beforeRequest(RequestContentDto requestContentDto) {
         RequestContent requestContent = new RequestContent();
         BeanUtil.copyProperties(requestContentDto, requestContent);
-        return requestContentDao.add(requestContent);
+        requestContentDto.setRequestId(requestContentDao.add(requestContent).getId());
     }
 
     @Override

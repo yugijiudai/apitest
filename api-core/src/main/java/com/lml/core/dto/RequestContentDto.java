@@ -16,6 +16,10 @@ import java.util.Map;
 @Accessors(chain = true)
 public class RequestContentDto {
 
+    /**
+     * 请求的id,数据库保存的请求表主键
+     */
+    private Integer requestId;
 
     /**
      * 请求的路径
@@ -47,10 +51,16 @@ public class RequestContentDto {
      */
     private Date startTime;
 
+
     /**
-     * 请求结束时间
+     * 请求组的名字
      */
-    private Date endTime;
+    private String requestGroup;
+
+    /**
+     * 当前请求的线程
+     */
+    private String threadName;
 
 
 }

@@ -68,4 +68,14 @@ public class RequestContent {
      */
     private String exceptionMsg;
 
+    /**
+     * 请求组的名字
+     */
+    private String requestGroup;
+
+    /**
+     * 当前请求的线程
+     */
+    private String threadName;
+
 }

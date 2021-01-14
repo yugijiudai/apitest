@@ -17,8 +17,8 @@ import com.lml.core.enums.RequestStatusEnum;
 import com.lml.core.exception.InitException;
 import com.lml.core.exception.RequestException;
 import com.lml.core.po.RequestContent;
-import com.lml.core.service.RequestContentService;
-import com.lml.core.service.RequestContentServiceImpl;
+import com.lml.core.service.RequestSubject;
+import com.lml.core.util.InitUtil;
 import com.lml.core.vo.RestVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -40,8 +40,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class HttpExt implements ReqExt {
 
-
-    private RequestContentService requestContentServiceImpl = new RequestContentServiceImpl();
 
     @Override
     public <T> RestVo<T> postForForm(RequestDto requestDto, Class<T> returnType) {
@@ -135,12 +133,13 @@ public class HttpExt implements ReqExt {
      * @return 返回请求的结果
      */
     private HttpResponse exe(HttpRequest httpRequest, RequestContentDto requestContentDto) {
+        // 通知需要执行请求前的所有类进行相关操作
         long start = System.currentTimeMillis();
-        requestContentDto.setStartTime(DateUtil.date(start));
-        // 请求前记录
-        RequestContent requestContent = requestContentServiceImpl.beforeRequest(requestContentDto);
+        RequestSubject requestSubject = InitUtil.getRequestSubject();
+        requestContentDto.setStartTime(DateUtil.date(start)).setThreadName(Thread.currentThread().getName());
+        requestSubject.notifyBeforeRequest(requestContentDto);
         HttpResponse execute;
-        RequestContent update = new RequestContent().setId(requestContent.getId());
+        RequestContent update = new RequestContent().setId(requestContentDto.getRequestId());
         try {
             execute = httpRequest.execute();
             log.debug("{}请求消耗了:{}ms", httpRequest.getUrl(), System.currentTimeMillis() - start);
@@ -154,7 +153,7 @@ public class HttpExt implements ReqExt {
         }
         finally {
             // 设置请求结束时间
-            requestContentServiceImpl.afterRequest(update.setEndTime(new Date()));
+            requestSubject.notifyAfterRequest(update.setEndTime(new Date()));
         }
         return execute;
     }
