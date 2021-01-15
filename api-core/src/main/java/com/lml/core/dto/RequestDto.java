@@ -48,4 +48,9 @@ public class RequestDto {
      */
     private JSONObject file;
 
+    /**
+     * 请求组的名字
+     */
+    private String requestGroup;
+
 }

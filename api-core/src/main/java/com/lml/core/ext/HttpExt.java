@@ -1,7 +1,5 @@
 package com.lml.core.ext;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -13,10 +11,8 @@ import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Maps;
 import com.lml.core.dto.RequestContentDto;
 import com.lml.core.dto.RequestDto;
-import com.lml.core.enums.RequestStatusEnum;
 import com.lml.core.exception.InitException;
 import com.lml.core.exception.RequestException;
-import com.lml.core.po.RequestContent;
 import com.lml.core.service.RequestSubject;
 import com.lml.core.util.InitUtil;
 import com.lml.core.vo.RestVo;
@@ -27,7 +23,6 @@ import org.springframework.http.HttpHeaders;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -122,7 +117,8 @@ public class HttpExt implements ReqExt {
      */
     private RequestContentDto buildRequestContentDtoCommon(RequestDto requestDto, HttpRequest httpRequest) {
         RequestContentDto requestContentDto = new RequestContentDto();
-        return requestContentDto.setContent(requestDto.getParam()).setName(requestDto.getName()).setHeaders(requestDto.getHeaders()).setUrl(httpRequest.getUrl()).setMethod(httpRequest.getMethod());
+        return requestContentDto.setContent(requestDto.getParam()).setName(requestDto.getName()).setHeaders(requestDto.getHeaders()).setUrl(httpRequest.getUrl())
+                .setMethod(httpRequest.getMethod()).setRequestGroup(requestDto.getRequestGroup());
     }
 
     /**
@@ -134,26 +130,23 @@ public class HttpExt implements ReqExt {
      */
     private HttpResponse exe(HttpRequest httpRequest, RequestContentDto requestContentDto) {
         // 通知需要执行请求前的所有类进行相关操作
-        long start = System.currentTimeMillis();
         RequestSubject requestSubject = InitUtil.getRequestSubject();
-        requestContentDto.setStartTime(DateUtil.date(start)).setThreadName(Thread.currentThread().getName());
         requestSubject.notifyBeforeRequest(requestContentDto);
         HttpResponse execute;
-        RequestContent update = new RequestContent().setId(requestContentDto.getRequestId());
         try {
             execute = httpRequest.execute();
-            log.debug("{}请求消耗了:{}ms", httpRequest.getUrl(), System.currentTimeMillis() - start);
-            update.setRequestStatus(RequestStatusEnum.OK);
+            // 请求成功的操作
+            requestSubject.notifySuccessRequest(requestContentDto);
         }
         catch (Throwable e) {
-            // 设置异常信息
-            update.setExceptionMsg(ExceptionUtil.stacktraceToString(e)).setRequestStatus(RequestStatusEnum.FAIL);
+            // 请求失败的操作
+            requestSubject.notifyFailRequest(requestContentDto, e);
             log.error(e.getMessage(), e);
             throw new RequestException(e);
         }
         finally {
-            // 设置请求结束时间
-            requestSubject.notifyAfterRequest(update.setEndTime(new Date()));
+            // 请求完成,无论失败或者成功都必须执行的操作
+            requestSubject.notifyAfterRequest(requestContentDto);
         }
         return execute;
     }

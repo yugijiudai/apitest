@@ -15,8 +15,8 @@ import com.lml.core.ext.ReqAdapter;
 import com.lml.core.ext.ReqExt;
 import com.lml.core.factory.RequestHandlerFactory;
 import com.lml.core.handler.RequestHandler;
-import com.lml.core.service.RequestContentService;
-import com.lml.core.service.RequestContentServiceImpl;
+import com.lml.core.service.RequestObserver;
+import com.lml.core.service.RequestRecordObserver;
 import com.lml.core.service.RequestSubject;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -169,8 +169,8 @@ public class InitUtil {
      * 初始化默认的请求处理器
      */
     public void initDefaultRequestContent() {
-        RequestContentService requestContentServiceImpl = new RequestContentServiceImpl();
-        requestSubject.add(requestContentServiceImpl);
+        RequestObserver requestObserverImpl = new RequestRecordObserver();
+        requestSubject.add(requestObserverImpl);
     }
 
     /**

@@ -32,7 +32,7 @@ public class RequestContentDao {
 
     private static final String TABLE = "request_content";
 
-    private static final String SELECT = "select rc.id, rc.name, rc.method, rc.start_time, rc.end_time, rc.headers, rc.request_status, rc.content, rc.url, rc.exception_msg";
+    private static final String SELECT = "select rc.id, rc.name, rc.method, rc.start_time, rc.end_time, rc.headers, rc.request_status, rc.content, rc.url, rc.exception_msg, rc.thread_name, rc.request_group";
 
 
     /**
@@ -47,7 +47,9 @@ public class RequestContentDao {
                     .set("name", requestContent.getName())
                     .set("method", requestContent.getMethod().name())
                     .set("start_time", requestContent.getStartTime())
-                    .set("url", requestContent.getUrl());
+                    .set("url", requestContent.getUrl())
+                    .set("thread_name", requestContent.getThreadName())
+                    .set("request_group", requestContent.getRequestGroup());
             Map<String, Object> headers = requestContent.getHeaders();
             if (MapUtils.isNotEmpty(headers)) {
                 entity.set("headers", JSONUtil.toJsonStr(headers));
@@ -122,6 +124,8 @@ public class RequestContentDao {
         requestContent.setExceptionMsg(entity.getStr("exception_msg"));
         String headers = entity.getStr("headers");
         requestContent.setRequestStatus(entity.getEnum(RequestStatusEnum.class, "request_status"));
+        requestContent.setRequestGroup(entity.getStr("request_group"));
+        requestContent.setThreadName(entity.getStr("thread_name"));
         if (StringUtils.isNotBlank(headers)) {
             requestContent.setHeaders(JSONUtil.toBean(headers, Map.class));
         }

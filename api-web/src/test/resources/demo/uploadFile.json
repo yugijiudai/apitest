@@ -2,6 +2,7 @@
   "request": {
     "method": "postFromData",
     "url": "/uploadFile",
+    "requestGroup": "请求组1",
     "file": {
       "uploadFile": [
         "${file1}",

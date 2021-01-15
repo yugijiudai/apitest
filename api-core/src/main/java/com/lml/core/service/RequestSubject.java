@@ -1,7 +1,6 @@
 package com.lml.core.service;
 
 import com.lml.core.dto.RequestContentDto;
-import com.lml.core.po.RequestContent;
 import org.apache.commons.compress.utils.Lists;
 
 import java.util.List;
@@ -16,24 +15,15 @@ public class RequestSubject {
     /**
      * 请求的列表处理器
      */
-    private List<RequestContentService> requestList = Lists.newArrayList();
+    private List<RequestObserver> requestList = Lists.newArrayList();
 
     /**
      * 增加订阅者
      *
-     * @param observer {@link RequestContentService}
+     * @param observer {@link RequestObserver}
      */
-    public void add(RequestContentService observer) {
+    public void add(RequestObserver observer) {
         requestList.add(observer);
-    }
-
-    /**
-     * 删除订阅者
-     *
-     * @param observer {@link RequestContentService}
-     */
-    public void remove(RequestContentService observer) {
-        requestList.remove(observer);
     }
 
 
@@ -43,19 +33,31 @@ public class RequestSubject {
      * @param requestContentDto {@link RequestContentDto}
      */
     public void notifyBeforeRequest(RequestContentDto requestContentDto) {
-        for (RequestContentService requestContentService : requestList) {
-            requestContentService.beforeRequest(requestContentDto);
+        for (RequestObserver requestObserver : requestList) {
+            requestObserver.beforeRequest(requestContentDto);
         }
     }
 
     /**
      * 通知订阅者做请求后的操作
      *
-     * @param requestContent {@link RequestContent}
+     * @param requestContentDto {@link RequestContentDto}
      */
-    public void notifyAfterRequest(RequestContent requestContent) {
-        for (RequestContentService requestContentService : requestList) {
-            requestContentService.afterRequest(requestContent);
+    public void notifyAfterRequest(RequestContentDto requestContentDto) {
+        for (RequestObserver requestObserver : requestList) {
+            requestObserver.afterRequest(requestContentDto);
+        }
+    }
+
+    public void notifySuccessRequest(RequestContentDto requestContentDto) {
+        for (RequestObserver requestObserver : requestList) {
+            requestObserver.onSuccessRequest(requestContentDto);
+        }
+    }
+
+    public void notifyFailRequest(RequestContentDto requestContentDto, Throwable throwable) {
+        for (RequestObserver requestObserver : requestList) {
+            requestObserver.onFailRequest(requestContentDto, throwable);
         }
     }
 
