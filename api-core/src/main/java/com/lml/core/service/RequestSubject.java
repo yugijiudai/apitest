@@ -28,6 +28,13 @@ public class RequestSubject {
 
 
     /**
+     * 清除所有的观察者
+     */
+    public void clear() {
+        requestList.clear();
+    }
+
+    /**
      * 通知订阅者做请求前的操作
      *
      * @param requestContentDto {@link RequestContentDto}
