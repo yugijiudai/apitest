@@ -37,7 +37,7 @@ public class AssertCallBackHandler implements RequestCallBackHandler {
     private void assertCode(JSONObject ext, JSONObject actualVo) {
         SettingDto settingDto = InitUtil.getSettingDto();
         // 断言状态码,状态码不能为空
-        Assert.assertEquals(ext.getInt(settingDto.getCode()), actualVo.getInt(settingDto.getCode()));
+        Assert.assertEquals(actualVo.getInt(settingDto.getCode()), ext.getInt(settingDto.getCode()));
     }
 
     /**
@@ -57,7 +57,7 @@ public class AssertCallBackHandler implements RequestCallBackHandler {
             JSONObject expectJsonData = JSONUtil.parseObj(expectData);
             JSONObject actualJsonData = JSONUtil.parseObj(actualData);
             for (Map.Entry<String, Object> entry : expectJsonData.entrySet()) {
-                Assert.assertEquals(entry.getValue(), actualJsonData.get(entry.getKey()));
+                Assert.assertEquals(actualJsonData.get(entry.getKey()), entry.getValue());
             }
         }
         else if (JSONUtil.isJsonArray(expectData)) {
@@ -66,7 +66,7 @@ public class AssertCallBackHandler implements RequestCallBackHandler {
             Assert.assertEquals(expectJsonArray, actualJsonArray);
         }
         else {
-            Assert.assertEquals(expectData, actualData);
+            Assert.assertEquals(actualData, expectData);
         }
     }
 
@@ -81,7 +81,7 @@ public class AssertCallBackHandler implements RequestCallBackHandler {
         String expectMsg = ext.getStr(settingDto.getMsg());
         // 断言返回信息,提示消息可以为空
         if (StringUtils.isNotBlank(expectMsg)) {
-            Assert.assertEquals(expectMsg, actualVo.getStr(settingDto.getMsg()));
+            Assert.assertEquals(actualVo.getStr(settingDto.getMsg()), expectMsg);
         }
     }
 

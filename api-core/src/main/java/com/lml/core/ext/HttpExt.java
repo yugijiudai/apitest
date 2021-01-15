@@ -1,13 +1,15 @@
 package com.lml.core.ext;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.MultiFileResource;
+import cn.hutool.core.io.resource.Resource;
 import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.lml.core.dto.RequestContentDto;
 import com.lml.core.dto.RequestDto;
@@ -22,10 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 
 import java.io.File;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author yugi
@@ -41,7 +41,7 @@ public class HttpExt implements ReqExt {
         HttpRequest post = HttpRequest.post(requestDto.getUrl());
         JSONObject reqObj = JSONUtil.parseObj(requestDto.getParam());
         // 处理上传文件,这里会改变reqObj,所以要重新设置到param里
-        post = this.handleUploadFile(requestDto.getFile(), post, reqObj);
+        post = this.handleUploadFile(requestDto.getFile(), post);
         requestDto.setParam(JSONUtil.toJsonStr(reqObj));
         HttpResponse execute = doFormRequest(post, requestDto);
         return afterReq(returnType, execute);
@@ -129,6 +129,8 @@ public class HttpExt implements ReqExt {
      * @return 返回请求的结果
      */
     private HttpResponse exe(HttpRequest httpRequest, RequestContentDto requestContentDto) {
+        // 解析上传文件的参数,把resource的路径提取出来放在requestContentDto中,旧版的hutool可以把识别到字符串路径当成文件去处理,新版则不可以,所以不能在handleUploadFile的请求参数中设置成字符串的路径,需要在这里重新解析,存入数据库中
+        this.setUploadFileParam(httpRequest, requestContentDto);
         // 通知需要执行请求前的所有类进行相关操作
         RequestSubject requestSubject = InitUtil.getRequestSubject();
         requestSubject.notifyBeforeRequest(requestContentDto);
@@ -229,10 +231,9 @@ public class HttpExt implements ReqExt {
      *
      * @param uploadFile 上传文件的参数
      * @param post       {@link HttpRequest}
-     * @param map        请求参数
      * @return {@link HttpRequest}
      */
-    private HttpRequest handleUploadFile(Map<String, Object> uploadFile, HttpRequest post, Map<String, Object> map) {
+    private HttpRequest handleUploadFile(Map<String, Object> uploadFile, HttpRequest post) {
         if (uploadFile == null) {
             return post;
         }
@@ -242,16 +243,36 @@ public class HttpExt implements ReqExt {
         for (Map.Entry<String, Object> entry : uploadFile.entrySet()) {
             JSONArray uploadFiles = JSONUtil.parseArray(entry.getValue());
             // 获取所有的上传文件
-            List<File> files = uploadFiles.stream().map(fileName -> {
-                URL resource = ResourceUtil.getResource(fileName.toString());
-                return FileUtil.file(resource);
-            }).collect(Collectors.toList());
-            // 这里需要把list转成数组,因为参数是可变数组,不转会报错
-            post.form(entry.getKey(), ArrayUtil.toArray(files, File.class));
+            File[] files = uploadFiles.stream().map(fileName -> FileUtil.file(ResourceUtil.getResource(fileName.toString()))).toArray(File[]::new);
+            post.form(entry.getKey(), files);
         }
-        // 把上传文件的参数放在请求上面,用于记录到数据库,暂时没发现问题
-        map.putAll(uploadFile);
+        log.debug("上传请求的参数是:{}", post.fileForm());
         return post;
+    }
+
+
+    /**
+     * 设置上传文件的的参数,把resource解析成字符串路径
+     *
+     * @param post              请求对象
+     * @param requestContentDto {@link RequestContentDto}
+     */
+    private void setUploadFileParam(HttpRequest post, RequestContentDto requestContentDto) {
+        // 这里不能用post.fileForm()来判断,如果不是上传的请求会有空指针
+        if (post.form() == null) {
+            return;
+        }
+        Map<String, Resource> fileForm = post.fileForm();
+        // 需要请求的参数
+        JSONObject requestJson = JSONUtil.parseObj(requestContentDto.getContent());
+        for (Map.Entry<String, Resource> entry : fileForm.entrySet()) {
+            MultiFileResource fileResource = (MultiFileResource) entry.getValue();
+            List<Object> fileUrlList = Lists.newArrayList();
+            fileResource.forEach(resource -> fileUrlList.add(resource.getUrl().getPath()));
+            requestJson.set(entry.getKey(), fileUrlList);
+        }
+        // 把上传的参数重新设置回到content里
+        requestContentDto.setContent(requestJson.toString());
     }
 
 
