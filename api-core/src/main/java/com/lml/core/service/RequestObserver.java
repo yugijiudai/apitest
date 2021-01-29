@@ -39,4 +39,18 @@ public interface RequestObserver {
      */
     void onFailRequest(RequestContentDto requestContentDto, Throwable throwable);
 
+    /**
+     * 是否需要注册到监听者列表
+     *
+     * @return true表示注册, false表示不注册
+     */
+    boolean isRegister();
+
+    /**
+     * 注册到监听者列表的顺序
+     *
+     * @return 数字越大顺序越后
+     */
+    int registerOrder();
+
 }

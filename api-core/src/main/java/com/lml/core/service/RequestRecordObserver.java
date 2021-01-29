@@ -49,6 +49,16 @@ public class RequestRecordObserver implements RequestObserver {
         this.updateRequest(requestContentDto, update);
     }
 
+    @Override
+    public boolean isRegister() {
+        return true;
+    }
+
+    @Override
+    public int registerOrder() {
+        return 0;
+    }
+
     /**
      * 更新请求的通用操作
      *

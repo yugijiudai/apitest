@@ -1,8 +1,10 @@
 package com.lml.core.service;
 
 import com.lml.core.dto.RequestContentDto;
+import lombok.Getter;
 import org.apache.commons.compress.utils.Lists;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -15,6 +17,7 @@ public class RequestSubject {
     /**
      * 请求的列表处理器
      */
+    @Getter
     private List<RequestObserver> requestList = Lists.newArrayList();
 
     /**
@@ -35,6 +38,13 @@ public class RequestSubject {
     }
 
     /**
+     * 对列表执行顺序重新排序,order的值越小排的越前
+     */
+    public void order() {
+        requestList.sort(Comparator.comparingInt(RequestObserver::registerOrder));
+    }
+
+    /**
      * 通知订阅者做请求前的操作
      *
      * @param requestContentDto {@link RequestContentDto}
@@ -46,7 +56,7 @@ public class RequestSubject {
     }
 
     /**
-     * 通知订阅者做请求后的操作
+     * 通知订阅者做请求后的操作,无论失败或者成功都会被调用
      *
      * @param requestContentDto {@link RequestContentDto}
      */
@@ -56,12 +66,23 @@ public class RequestSubject {
         }
     }
 
+    /**
+     * 通知订阅者做请求成功后的操作
+     *
+     * @param requestContentDto {@link RequestContentDto}
+     */
     public void notifySuccessRequest(RequestContentDto requestContentDto) {
         for (RequestObserver requestObserver : requestList) {
             requestObserver.onSuccessRequest(requestContentDto);
         }
     }
 
+
+    /**
+     * 通知订阅者做请求失败后的操作
+     *
+     * @param requestContentDto {@link RequestContentDto}
+     */
     public void notifyFailRequest(RequestContentDto requestContentDto, Throwable throwable) {
         for (RequestObserver requestObserver : requestList) {
             requestObserver.onFailRequest(requestContentDto, throwable);

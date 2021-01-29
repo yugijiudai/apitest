@@ -3,12 +3,15 @@ package com.lml.core.util;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.setting.dialect.Props;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.lml.core.dto.SettingDto;
 import com.lml.core.exception.InitException;
 import com.lml.core.ext.ReqAdapter;
@@ -21,11 +24,14 @@ import com.lml.core.service.RequestSubject;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author yugi
@@ -84,7 +90,7 @@ public class InitUtil {
      * @param clz 指定使用的请求类,如果没有则使用配置里面的
      * @return {@link ReqAdapter}
      */
-    public ReqAdapter initReqAdapter(Class clz) {
+    public ReqAdapter initReqAdapter(Class<?> clz) {
         String initClassName = clz != null ? clz.getName() : settingDto.getReqExt();
         ReqExt reqExt = ReflectUtil.newInstance(initClassName);
         log.info("默认的http请求类是{}.............", reqExt);
@@ -169,8 +175,54 @@ public class InitUtil {
      * 初始化默认的请求处理器
      */
     public void initDefaultRequestContent() {
+        Map<String, RequestObserver> observerMap = Maps.newLinkedHashMap();
         RequestObserver requestObserverImpl = new RequestRecordObserver();
-        requestSubject.add(requestObserverImpl);
+        // 默认需要注册的观察者
+        observerMap.put(requestObserverImpl.getClass().getName(), requestObserverImpl);
+        // 配置指定需要注册的观察者
+        Map<String, RequestObserver> extraMap = initExtraRequestObserver();
+        observerMap.putAll(extraMap);
+        for (RequestObserver observer : observerMap.values()) {
+            requestSubject.add(observer);
+        }
+        // 排序
+        requestSubject.order();
+        log.debug("===================初始化请求观察者{}的子类完成===================", RequestObserver.class.getSimpleName());
+        log.debug("总共注册了的观者者列表:{}", requestSubject.getRequestList());
+    }
+
+    /**
+     * 初始化额外的请求处理器,这个需要在lml.properties中声明需要扫描的包
+     *
+     * @return key是所在的包名, value是对应的子类, 这样做是为了出现同名同包的子类, 防止重复注册
+     */
+    private Map<String, RequestObserver> initExtraRequestObserver() {
+        Map<String, RequestObserver> needToRegisterMap = Maps.newLinkedHashMap();
+        String requestObserverPackage = settingDto.getRequestObserverPackage();
+        if (StringUtils.isBlank(requestObserverPackage)) {
+            log.debug("没有额外需要注册的请求监听者,额外注册结束......");
+            return needToRegisterMap;
+        }
+        String[] packageList = requestObserverPackage.split(",");
+        Set<Class<?>> allChildren = Sets.newLinkedHashSet();
+        for (String packageName : packageList) {
+            Set<Class<?>> childrenClazz = ClassUtil.scanPackageBySuper(packageName, RequestObserver.class);
+            log.debug("{}包下找到{}个需要额外注册的类", packageName, childrenClazz.size());
+            allChildren.addAll(childrenClazz);
+        }
+        for (Class<?> clz : allChildren) {
+            try {
+                RequestObserver eh = (RequestObserver) clz.getDeclaredConstructor().newInstance();
+                log.debug("初始化{}成功,这个是否要注册到列表:{}", eh, eh.isRegister());
+                if (eh.isRegister()) {
+                    needToRegisterMap.put(eh.getClass().getName(), eh);
+                }
+            }
+            catch (Exception e) {
+                throw new InitException("注册请求监听者失败!", e);
+            }
+        }
+        return needToRegisterMap;
     }
 
     /**

@@ -42,4 +42,9 @@ public class SettingDto {
      */
     private String dataSourcePool;
 
+    /**
+     * 请求监听者实现类所在的包,用来扩展请求动作,如果包有多个,可以使用逗号隔开
+     */
+    private String requestObserverPackage;
+
 }
