@@ -188,7 +188,7 @@ public class InitUtil {
         // 排序
         requestSubject.order();
         log.debug("===================初始化请求观察者{}的子类完成===================", RequestObserver.class.getSimpleName());
-        log.debug("总共注册了的观者者列表:{}", requestSubject.getRequestList());
+        log.debug("总共注册了的观者列表:{}", requestSubject.getRequestList());
     }
 
     /**
@@ -210,6 +210,7 @@ public class InitUtil {
             log.debug("{}包下找到{}个需要额外注册的类", packageName, childrenClazz.size());
             allChildren.addAll(childrenClazz);
         }
+        // 遍历所有扫描到的子类
         for (Class<?> clz : allChildren) {
             try {
                 RequestObserver eh = (RequestObserver) clz.getDeclaredConstructor().newInstance();
