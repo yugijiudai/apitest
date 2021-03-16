@@ -45,7 +45,7 @@ public class RequestRecordObserver implements RequestObserver {
     @Override
     public void onFailRequest(RequestContentDto requestContentDto, Throwable throwable) {
         RequestContent update = new RequestContent();
-        update.setExceptionMsg(ExceptionUtil.stacktraceToString(throwable)).setRequestStatus(RequestStatusEnum.FAIL);
+        update.setExceptionMsg(ExceptionUtil.stacktraceToString(throwable, Integer.MAX_VALUE)).setRequestStatus(RequestStatusEnum.FAIL);
         this.updateRequest(requestContentDto, update);
     }
 
