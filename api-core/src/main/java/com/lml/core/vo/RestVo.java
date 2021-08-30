@@ -2,7 +2,9 @@ package com.lml.core.vo;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.http.HttpHeaders;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author yugi
@@ -13,7 +15,7 @@ import org.springframework.http.HttpHeaders;
 @Accessors(chain = true)
 public class RestVo<T> {
 
-    private HttpHeaders httpHeaders;
+    private Map<String, List<String>> httpHeaders;
 
     private T result;
 

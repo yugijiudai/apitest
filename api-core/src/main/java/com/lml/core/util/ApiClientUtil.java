@@ -14,9 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListValuedMap;
 import org.apache.commons.collections4.MultiMapUtils;
-import org.springframework.http.HttpHeaders;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yugi
@@ -108,7 +108,7 @@ public class ApiClientUtil {
      * @param key         cookie的key
      * @return 符合这个cookie的key的值列表
      */
-    public List<Object> getCookieByKey(HttpHeaders httpHeaders, String key) {
+    public List<Object> getCookieByKey(Map<String, List<String>> httpHeaders, String key) {
         ListValuedMap<String, Object> map = transCookieToMap(httpHeaders);
         if (map.isEmpty()) {
             throw new BizException("没有" + key + "这个cookie!");
@@ -122,7 +122,7 @@ public class ApiClientUtil {
      * @param httpHeaders 请求头部
      * @return 返回一个多值类型的map
      */
-    public ListValuedMap<String, Object> transCookieToMap(HttpHeaders httpHeaders) {
+    public ListValuedMap<String, Object> transCookieToMap(Map<String, List<String>> httpHeaders) {
         ListValuedMap<String, Object> map = MultiMapUtils.newListValuedHashMap();
         List<String> cookies = httpHeaders.get(COOKIE_KEY);
         if (CollectionUtils.isEmpty(cookies)) {

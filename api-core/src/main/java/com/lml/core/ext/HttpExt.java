@@ -11,6 +11,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.HttpHeaders;
 import com.lml.core.dto.RequestContentDto;
 import com.lml.core.dto.RequestDto;
 import com.lml.core.exception.InitException;
@@ -21,7 +22,6 @@ import com.lml.core.vo.RestVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
 
 import java.io.File;
 import java.util.List;
@@ -187,7 +187,7 @@ public class HttpExt implements ReqExt {
      * @param execute 请求响应体
      * @return 返回设置好的头部
      */
-    private HttpHeaders setResponseHeader(HttpResponse execute) {
+    private Map<String, List<String>> setResponseHeader(HttpResponse execute) {
         Map<String, List<String>> responseHeaders = execute.headers();
         Map<String, List<String>> newResponseHeaders = Maps.newHashMap();
         responseHeaders.forEach((key, val) -> {
@@ -196,7 +196,7 @@ public class HttpExt implements ReqExt {
                 newResponseHeaders.put(key, val);
             }
         });
-        HttpHeaders resHeader = new HttpHeaders();
+        Map<String, List<String>> resHeader = Maps.newLinkedHashMap();
         resHeader.putAll(newResponseHeaders);
         return resHeader;
     }
@@ -213,7 +213,7 @@ public class HttpExt implements ReqExt {
     private <T> RestVo<T> afterReq(Class<T> returnType, HttpResponse execute) {
         RestVo<T> restVo = new RestVo<>();
         String body = execute.body();
-        HttpHeaders resHeader = this.setResponseHeader(execute);
+        Map<String, List<String>> resHeader = this.setResponseHeader(execute);
         restVo.setHttpHeaders(resHeader);
         // 如果返回的内容是json格式,则把他转成对应的json对象类
         if (!JSONUtil.isJson(body)) {
