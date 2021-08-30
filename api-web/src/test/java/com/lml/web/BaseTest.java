@@ -34,7 +34,7 @@ public abstract class BaseTest {
      * @param useDefaultCallBack 是否要执行默认的回调
      */
     protected void doRequest(String script, boolean useDefaultCallBack) {
-        ApiClientUtil.doApiRequest(script, useDefaultCallBack ? callBackLists : null);
+        ApiClientUtil.doApiRequestCallBack(script, useDefaultCallBack ? callBackLists : null);
     }
 
 
@@ -45,7 +45,7 @@ public abstract class BaseTest {
      * @param useDefaultCallBack 是否要执行默认的回调
      */
     protected void doRequest(JSONObject json, boolean useDefaultCallBack) {
-        ApiClientUtil.doApiRequest(json, useDefaultCallBack ? callBackLists : null);
+        ApiClientUtil.doApiRequestCallBack(json, useDefaultCallBack ? callBackLists : null);
     }
 
     /**
@@ -61,6 +61,6 @@ public abstract class BaseTest {
             list.addAll(callBackLists);
         }
         list.addAll(selfHandler);
-        ApiClientUtil.doApiRequest(script, list);
+        ApiClientUtil.doApiRequestCallBack(script, list);
     }
 }

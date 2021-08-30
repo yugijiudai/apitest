@@ -16,7 +16,7 @@ public class SelfDataTest extends BaseTest {
 
     @Test
     public void loadSelfDataTest() {
-        JSONArray objects = InitUtil.loadSelfData("demo/data/userData.json", "demo/userDelete.json");
+        JSONArray objects = InitUtil.loadSelfData("demo/apiClient/data/userData.json", "demo/apiClient/userDelete.json");
         objects.forEach(json -> {
             this.doRequest((JSONObject) json, true);
         });

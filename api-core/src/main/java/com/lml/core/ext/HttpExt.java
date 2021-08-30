@@ -4,8 +4,11 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.MultiFileResource;
 import cn.hutool.core.io.resource.Resource;
 import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.core.text.UnicodeUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -24,6 +27,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +48,7 @@ public class HttpExt implements ReqExt {
         post = this.handleUploadFile(requestDto.getFile(), post);
         requestDto.setParam(JSONUtil.toJsonStr(reqObj));
         HttpResponse execute = doFormRequest(post, requestDto);
-        return afterReq(returnType, execute);
+        return setResponseResult(returnType, execute);
     }
 
 
@@ -52,7 +56,7 @@ public class HttpExt implements ReqExt {
     public <T> RestVo<T> post(RequestDto requestDto, Class<T> returnType) {
         HttpRequest post = HttpRequest.post(requestDto.getUrl());
         HttpResponse execute = doJsonRequest(post, requestDto);
-        return afterReq(returnType, execute);
+        return setResponseResult(returnType, execute);
     }
 
 
@@ -60,21 +64,21 @@ public class HttpExt implements ReqExt {
     public <T> RestVo<T> get(RequestDto requestDto, Class<T> returnType) {
         HttpRequest get = HttpRequest.get(requestDto.getUrl());
         HttpResponse execute = doFormRequest(get, requestDto);
-        return afterReq(returnType, execute);
+        return setResponseResult(returnType, execute);
     }
 
     @Override
     public <T> RestVo<T> put(RequestDto requestDto, Class<T> returnType) {
         HttpRequest put = HttpRequest.put(requestDto.getUrl());
         HttpResponse execute = doJsonRequest(put, requestDto);
-        return afterReq(returnType, execute);
+        return setResponseResult(returnType, execute);
     }
 
     @Override
     public <T> RestVo<T> delete(RequestDto requestDto, Class<T> returnType) {
         HttpRequest delete = HttpRequest.delete(requestDto.getUrl());
         HttpResponse execute = doFormRequest(delete, requestDto);
-        return afterReq(returnType, execute);
+        return setResponseResult(returnType, execute);
     }
 
     /**
@@ -155,7 +159,7 @@ public class HttpExt implements ReqExt {
 
 
     /**
-     * 设置请求的头部
+     * 设置请求的头部,请求头不能有中文,否则需要转码,如果要转码,服务器获取的时候也是需要转码的
      *
      * @param headers 需要设置的头部
      * @param post    请求对象
@@ -202,7 +206,7 @@ public class HttpExt implements ReqExt {
     }
 
     /**
-     * 请求之后的处理
+     * 设置返回的结果
      *
      * @param returnType 请求返回的数据需要转成的类型
      * @param execute    请求返回的数据
@@ -210,7 +214,7 @@ public class HttpExt implements ReqExt {
      * @return {@link RestVo}
      */
     @SuppressWarnings("unchecked")
-    private <T> RestVo<T> afterReq(Class<T> returnType, HttpResponse execute) {
+    private <T> RestVo<T> setResponseResult(Class<T> returnType, HttpResponse execute) {
         RestVo<T> restVo = new RestVo<>();
         String body = execute.body();
         Map<String, List<String>> resHeader = this.setResponseHeader(execute);

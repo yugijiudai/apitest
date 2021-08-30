@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  * @author yugi
- * @apiNote http请求的客户端工具类
+ * @apiNote http请求的客户端工具类, 用来加载脚本文件自动发出请求, 或者直接传构造好的json对象用于直接请求
  * @since 2019-08-06
  */
 @UtilityClass
@@ -30,7 +30,7 @@ public class ApiClientUtil {
     /**
      * 脚本request字段
      */
-    private final String REQ_KEY = "request";
+    public final String REQ_KEY = "request";
 
     /**
      * 脚本response字段
@@ -49,9 +49,9 @@ public class ApiClientUtil {
      * @param fileName      要加载的脚本路径
      * @param callBackLists 请求接口后需要执行的回调,是个list,可以自己定义然后回调的处理顺序
      */
-    public void doApiRequest(String fileName, List<RequestCallBackHandler> callBackLists) {
+    public void doApiRequestCallBack(String fileName, List<RequestCallBackHandler> callBackLists) {
         JSONObject json = InitUtil.loadReqContent(fileName);
-        doApiRequest(json, callBackLists);
+        doApiRequestCallBack(json, callBackLists);
     }
 
     /**
@@ -60,7 +60,7 @@ public class ApiClientUtil {
      * @param json          加载好的脚本
      * @param callBackLists 请求接口后需要执行的回调,是个list,可以自己定义然后回调的处理顺序
      */
-    public void doApiRequest(JSONObject json, List<RequestCallBackHandler> callBackLists) {
+    public void doApiRequestCallBack(JSONObject json, List<RequestCallBackHandler> callBackLists) {
         RestVo<JSONObject> actual = doApiRequest(json);
         // 获取断言的数据
         String response = json.getStr(RES_KEY);
@@ -75,7 +75,7 @@ public class ApiClientUtil {
     }
 
     /**
-     * 直接传加载好的脚本并且进行接口的请求
+     * 直接传加载好的脚本并且进行接口的请求,没有回调函数,需要根据实际自己断言
      *
      * @param script 加载好的脚本的路径
      * @return 返回请求后的数据
@@ -86,9 +86,9 @@ public class ApiClientUtil {
     }
 
     /**
-     * 直接传加载好的脚本并且进行接口的请求
+     * 传封装好的请求对象用于直接请求,最底层的的请求,所有方法请求最终会调用这个方法,没有回调函数,需要根据实际自己断言
      *
-     * @param json 加载好的脚本
+     * @param json 请求的对象
      * @return 返回请求后的数据
      */
     public RestVo<JSONObject> doApiRequest(JSONObject json) {

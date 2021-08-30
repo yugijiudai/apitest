@@ -26,34 +26,34 @@ public class ApiClientUtilTest extends BaseTest {
 
     @Test
     public void userPostTest() {
-        this.doRequest("demo/userPost.json");
+        this.doRequest("demo/apiClient/userPost.json");
     }
 
     @Test
     public void userPostFormTest() {
-        this.doRequest("demo/userPostForm.json");
+        this.doRequest("demo/apiClient/userPostForm.json");
     }
 
     @Test
     public void userPutTest() {
-        this.doRequest("demo/userPut.json");
+        this.doRequest("demo/apiClient/userPut.json");
     }
 
     @Test
     public void userGetTest() {
-        this.doRequest("demo/userGet.json");
+        this.doRequest("demo/apiClient/userGet.json");
     }
 
     @Test
     public void userDeleteTest() {
-        this.doRequest("demo/userDelete.json");
+        this.doRequest("demo/apiClient/userDelete.json");
     }
 
 
     @Test
     public void uploadFileTest() {
-        String file1 = "demo/uploadFile.json";
-        String file2 = "demo/getUser.json";
+        String file1 = "demo/apiClient/uploadFile.json";
+        String file2 = "demo/apiClient/getUser.json";
         GlobalVariableUtil.setCache("${file1}", file1);
         GlobalVariableUtil.setCache("${file2}", file2);
         this.doRequest(file1);
@@ -70,13 +70,13 @@ public class ApiClientUtilTest extends BaseTest {
             GlobalVariableUtil.setCache("${sessionId}", list.get(0));
         };
         // 先登录,然后回调中获取sessionId和登录时返回的随机字符串
-        this.selfDoRequest("demo/userLogin.json", true, Lists.newArrayList(loginHandler));
-        this.doRequest("demo/getUser.json");
+        this.selfDoRequest("demo/apiClient/userLogin.json", true, Lists.newArrayList(loginHandler));
+        this.doRequest("demo/apiClient/getUser.json");
     }
 
     @Test
     public void userLoginTest() {
-        this.doRequest("demo/userLogin.json");
+        this.doRequest("demo/apiClient/userLogin.json");
     }
 
 

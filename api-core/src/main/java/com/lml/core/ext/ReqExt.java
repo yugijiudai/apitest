@@ -1,8 +1,7 @@
 package com.lml.core.ext;
 
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.lml.core.dto.RequestDto;
 import com.lml.core.vo.RestVo;
@@ -78,11 +77,10 @@ public interface ReqExt {
      * @return 返回设置好的格式, 格式如下:["JSESSIONID=xxx", "name=lml"]
      */
     default List<String> getCookieList(Object cookiesJsonArr) {
-        JSONArray array = JSONUtil.parseArray(cookiesJsonArr);
+        List<JSONObject> array = JSONArray.parseArray(cookiesJsonArr.toString(), JSONObject.class);
         List<String> cookieList = Lists.newArrayList();
         array.forEach(obj -> {
-            JSONObject tmp = (JSONObject) obj;
-            tmp.forEach((key, val) -> cookieList.add(key + "=" + val));
+            obj.forEach((key, val) -> cookieList.add(key + "=" + val));
         });
         return cookieList;
     }
@@ -94,12 +92,9 @@ public interface ReqExt {
      * @return 返回设置好的格式, 格式如下:"TITAN_SESSION_ID=sss; TITAN_ACCID=910
      */
     default String toCookieList(Object cookiesJsonArr) {
-        JSONArray array = JSONUtil.parseArray(cookiesJsonArr);
+        List<JSONObject> array = JSONArray.parseArray(cookiesJsonArr.toString(), JSONObject.class);
         StringBuilder sb = new StringBuilder();
-        array.forEach(obj -> {
-            JSONObject tmp = (JSONObject) obj;
-            tmp.forEach((key, val) -> sb.append(key).append("=").append(val).append(";"));
-        });
+        array.forEach(obj -> obj.forEach((key, val) -> sb.append(key).append("=").append(val).append(";")));
         return sb.substring(0, sb.length() - 1);
     }
 

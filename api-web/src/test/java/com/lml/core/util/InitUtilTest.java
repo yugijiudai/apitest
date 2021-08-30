@@ -1,6 +1,5 @@
 package com.lml.core.util;
 
-import cn.hutool.json.JSONObject;
 import com.google.common.collect.Lists;
 import org.testng.annotations.Test;
 
@@ -11,11 +10,6 @@ import org.testng.annotations.Test;
  */
 public class InitUtilTest {
 
-    @Test
-    public void testJson5() {
-        JSONObject jsonObject = InitUtil.loadReqContent("demo/json5Demo.json5");
-        System.out.println(jsonObject);
-    }
 
     @Test
     public void testVariable() {
