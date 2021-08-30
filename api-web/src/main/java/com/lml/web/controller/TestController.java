@@ -91,22 +91,22 @@ public class TestController {
 
     private JSONObject buildFail(String msg) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("code", HttpStatus.FORBIDDEN.value());
-        jsonObject.put("msg", msg);
+        jsonObject.set("code", HttpStatus.FORBIDDEN.value());
+        jsonObject.set("msg", msg);
         return jsonObject;
     }
 
     private JSONObject buildJsonSuccess(Object data) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("code", HttpStatus.OK.value());
-        jsonObject.put("data", JSONUtil.toJsonStr(data));
+        jsonObject.set("code", HttpStatus.OK.value());
+        jsonObject.set("data", JSONUtil.toJsonStr(data));
         return jsonObject;
     }
 
     private JSONObject buildSuccess(Object data) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("code", HttpStatus.OK.value());
-        jsonObject.put("data", data);
+        jsonObject.set("code", HttpStatus.OK.value());
+        jsonObject.set("data", data);
         return jsonObject;
     }
 }

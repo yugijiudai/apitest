@@ -23,8 +23,6 @@ public class RequestRecordObserver implements RequestObserver {
 
     @Override
     public void beforeRequest(RequestContentDto requestContentDto) {
-        long start = System.currentTimeMillis();
-        requestContentDto.setStartTime(DateUtil.date(start)).setThreadName(Thread.currentThread().getName());
         RequestContent requestContent = new RequestContent();
         BeanUtil.copyProperties(requestContentDto, requestContent);
         requestContentDto.setRequestId(requestContentDao.add(requestContent).getId());
@@ -32,7 +30,6 @@ public class RequestRecordObserver implements RequestObserver {
 
     @Override
     public void afterRequest(RequestContentDto requestContentDto) {
-        log.debug("{}请求消耗了:{}ms", requestContentDto.getUrl(), System.currentTimeMillis() - requestContentDto.getStartTime().getTime());
     }
 
     @Override
@@ -56,7 +53,7 @@ public class RequestRecordObserver implements RequestObserver {
 
     @Override
     public int registerOrder() {
-        return 0;
+        return 1;
     }
 
     /**

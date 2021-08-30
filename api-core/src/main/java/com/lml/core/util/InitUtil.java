@@ -18,6 +18,7 @@ import com.lml.core.ext.ReqAdapter;
 import com.lml.core.ext.ReqExt;
 import com.lml.core.factory.RequestHandlerFactory;
 import com.lml.core.handler.RequestHandler;
+import com.lml.core.service.RequestLogObserver;
 import com.lml.core.service.RequestObserver;
 import com.lml.core.service.RequestRecordObserver;
 import com.lml.core.service.RequestSubject;
@@ -176,9 +177,13 @@ public class InitUtil {
      */
     public void initDefaultRequestContent() {
         Map<String, RequestObserver> observerMap = Maps.newLinkedHashMap();
-        RequestObserver requestObserverImpl = new RequestRecordObserver();
-        // 默认需要注册的观察者
-        observerMap.put(requestObserverImpl.getClass().getName(), requestObserverImpl);
+        if (settingDto.getRegisterDefaultRequestObserver()) {
+            RequestObserver requestLogObserverImpl = new RequestLogObserver();
+            RequestObserver requestObserverImpl = new RequestRecordObserver();
+            // 默认需要注册的观察者
+            observerMap.put(requestLogObserverImpl.getClass().getName(), requestLogObserverImpl);
+            observerMap.put(requestObserverImpl.getClass().getName(), requestObserverImpl);
+        }
         // 配置指定需要注册的观察者
         Map<String, RequestObserver> extraMap = initExtraRequestObserver();
         observerMap.putAll(extraMap);

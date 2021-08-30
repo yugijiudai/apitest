@@ -4,14 +4,14 @@
     <parent>
         <artifactId>apitest</artifactId>
         <groupId>com.lml</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>api-web</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
 
 
     <properties>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.lml</groupId>
             <artifactId>api-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
 

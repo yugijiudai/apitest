@@ -47,4 +47,9 @@ public class SettingDto {
      */
     private String requestObserverPackage;
 
+    /**
+     * 是否注册默认的请求监听者,默认会注册RequestLogObserver和RequestRecordObserver
+     */
+    private Boolean registerDefaultRequestObserver = true;
+
 }
