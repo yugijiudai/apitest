@@ -1,0 +1,40 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "terms": {
+            "nc_brand_category_cn": [
+              "{{allBrand}}"
+            ]
+          }
+        },
+        {
+          "term": {
+            "is_main_post": {
+              "value": "{{post}}"
+            }
+          }
+        },
+        {
+          "term": {
+            "money": {
+              "value": "{{money}}"
+            }
+          }
+        },
+        {
+          "range": {
+            "publish_time": {
+              "from": "{{startTime}}",
+              "to": "{{endTime}}"
+            }
+          }
+        },
+        "{{nullName}}",
+        "{{nullEs}}",
+        "{{noise}}"
+      ]
+    }
+  },
+}

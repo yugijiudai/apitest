@@ -4,6 +4,8 @@
     <test name="ApiClientUtilTest">
         <classes>
             <class name="com.lml.web.util.ApiClientUtilTest"/>
+            <class name="com.lml.web.util.SelfDataTest"/>
+            <class name="com.lml.core.util.InitUtilTest"/>
         </classes>
     </test>
 </suite>

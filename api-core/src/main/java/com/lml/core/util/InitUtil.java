@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -29,7 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -45,22 +43,6 @@ public class InitUtil {
 
     @Getter
     private final SettingDto settingDto = loadSetting();
-
-    /**
-     * ${XXX}的正则匹配
-     */
-    private final String REGEX = "\\$\\{(.*?)}";
-
-    /**
-     * "#{XXX}"的正则匹配
-     */
-    private final String ARR_REGEX = "\"\\#\\{(.*?)}\"";
-
-
-    /**
-     * ?{XXX}的正则匹配
-     */
-    private final String DYNAMIC_REGEX = "\\?\\{(.*?)}";
 
     /**
      * 请求的观察者
@@ -81,7 +63,7 @@ public class InitUtil {
      */
     public JSONObject loadReqContent(String fileName) {
         String script = loadScript(fileName);
-        return JSONUtil.parseObj(formatVariable(script));
+        return JSONUtil.parseObj(ScriptFormatUtil.formatVariable(script));
     }
 
 
@@ -127,7 +109,7 @@ public class InitUtil {
         for (int i = 0; i < array.size(); i++) {
             JSONObject obj = array.getJSONObject(i);
             obj.forEach((key, val) -> GlobalVariableUtil.setCache("${" + key + "}", val));
-            JSONObject newObj = JSONUtil.parseObj(formatVariable(script));
+            JSONObject newObj = JSONUtil.parseObj(ScriptFormatUtil.formatVariable(script));
             needHandle.add(newObj);
         }
         return needHandle;
@@ -153,23 +135,6 @@ public class InitUtil {
         BeanUtil.copyProperties(prop, settingDto);
         log.debug("初始化配置成功:{}", settingDto);
         return settingDto;
-    }
-
-    /**
-     * 替换有占位符${xxx}的脚本
-     *
-     * @param script 加载好的脚本
-     * @return 返回替换好的占位符
-     */
-    public String formatVariable(String script) {
-        // 这里用fastjson读取文件再转换成原来的jsonObject,原因是hutool的jsonObject无法支持json5格式
-        script = com.alibaba.fastjson.JSONObject.parseObject(script).toString();
-        log.debug("原始脚本是:{}", script);
-        script = formatNormalVariable(script);
-        script = formatArrayVariable(script);
-        script = formatDynamicVariable(script);
-        log.debug("替换后的脚本是:{}", script);
-        return script;
     }
 
 
@@ -231,59 +196,5 @@ public class InitUtil {
         }
         return needToRegisterMap;
     }
-
-    /**
-     * 格式化普通类型的变量
-     *
-     * @param script 加载的脚本
-     * @return 把${xxx}替换成对应的变量
-     */
-    private String formatNormalVariable(String script) {
-        List<String> all = ReUtil.findAll(REGEX, script, 0);
-        for (String match : all) {
-            script = script.replace(match, GlobalVariableUtil.getCache(match).toString());
-        }
-        return script;
-    }
-
-    /**
-     * 格式化数组类型的变量
-     *
-     * @param script 加载的脚本
-     * @return 把#{xxx}转成["a", "b"]这种形式,并且替换对应的变量
-     */
-    @SuppressWarnings("unchecked")
-    private String formatArrayVariable(String script) {
-        List<String> arrAll = ReUtil.findAll(ARR_REGEX, script, 0);
-        for (String match : arrAll) {
-            // 匹配"#{xxx}",所以要截取第一个和最后一个双引号即#{xxx}
-            String cacheKey = match.substring(1, match.length() - 1);
-            List<String> cache = (List<String>) GlobalVariableUtil.getCache(cacheKey);
-            StringBuilder arrayString = new StringBuilder("[");
-            for (String tmp : cache) {
-                arrayString.append("\"").append(tmp).append("\"").append(",");
-            }
-            script = script.replace(match, arrayString.substring(0, arrayString.length() - 1) + "]");
-        }
-        return script;
-    }
-
-    /**
-     * 格式化动态变量
-     *
-     * @param script 加载的脚本
-     * @return 把?{xxx}替换成对应的内容
-     */
-    private String formatDynamicVariable(String script) {
-        // 匹配""?{xxx}""这种
-        List<String> all = ReUtil.findAll("\"" + DYNAMIC_REGEX + "\"", script, 0);
-        for (String match : all) {
-            // 截取前面和后面的双引号,变成"?{xxx}"这种
-            String cacheKey = match.substring(1, match.length() - 1);
-            script = script.replace(match, GlobalVariableUtil.getCache(cacheKey).toString());
-        }
-        return script;
-    }
-
 
 }
