@@ -162,7 +162,8 @@ public class InitUtil {
      * @return 返回替换好的占位符
      */
     public String formatVariable(String script) {
-        script = JSONUtil.parseObj(script).toString();
+        // 这里用fastjson读取文件再转换成原来的jsonObject,原因是hutool的jsonObject无法支持json5格式
+        script = com.alibaba.fastjson.JSONObject.parseObject(script).toString();
         log.debug("原始脚本是:{}", script);
         script = formatNormalVariable(script);
         script = formatArrayVariable(script);
