@@ -38,6 +38,11 @@ public class ApiClientUtil {
     private final String RES_KEY = "response";
 
     /**
+     * 脚本请求头字段
+     */
+    public final String HEADER = "headers";
+
+    /**
      * 请求header的cookie字段
      */
     private final String COOKIE_KEY = "Set-Cookie";

@@ -9,9 +9,6 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author yugi
  * @apiNote 简易请求工具类, 用于简化请求的步骤, 只需要提供一个参数的json文件即可
@@ -142,7 +139,7 @@ public class RequestUtil {
         JSONObject baseReq = new JSONObject();
         JSONObject header = requestDto.getHeaders();
         if (header != null) {
-            request.set("headers", header);
+            request.set(ApiClientUtil.HEADER, header);
         }
         return baseReq.set(ApiClientUtil.REQ_KEY, request);
     }
