@@ -50,6 +50,34 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
+
+
+        <!-- 依赖reportNg 关联testNg -->
+        <!--        <dependency>
+                    <groupId>com.github.sdrss</groupId>
+                    <artifactId>reportng</artifactId>
+                    <version>2.6.3</version>
+                </dependency>-->
+
+        <dependency>
+            <groupId>org.uncommons</groupId>
+            <artifactId>reportng</artifactId>
+            <version>reportng-2.6.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/reportng-2.6.4.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>velocity</groupId>
+            <artifactId>velocity</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+
+
     </dependencies>
 
     <build>
