@@ -4,11 +4,8 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.MultiFileResource;
 import cn.hutool.core.io.resource.Resource;
 import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.core.text.UnicodeUtil;
-import cn.hutool.core.util.URLUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -19,6 +16,7 @@ import com.lml.core.dto.RequestContentDto;
 import com.lml.core.dto.RequestDto;
 import com.lml.core.exception.InitException;
 import com.lml.core.exception.RequestException;
+import com.lml.core.holder.ReqHolder;
 import com.lml.core.service.RequestSubject;
 import com.lml.core.util.InitUtil;
 import com.lml.core.vo.RestVo;
@@ -27,7 +25,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -135,6 +132,7 @@ public class HttpExt implements ReqExt {
     private HttpResponse exe(HttpRequest httpRequest, RequestContentDto requestContentDto) {
         // 解析上传文件的参数,把resource的路径提取出来放在requestContentDto中,旧版的hutool可以把识别到字符串路径当成文件去处理,新版则不可以,所以不能在handleUploadFile的请求参数中设置成字符串的路径,需要在这里重新解析,存入数据库中
         this.setUploadFileParam(httpRequest, requestContentDto);
+        this.setTraceId(requestContentDto);
         // 通知需要执行请求前的所有类进行相关操作
         RequestSubject requestSubject = InitUtil.getRequestSubject();
         requestSubject.notifyBeforeRequest(requestContentDto);
@@ -155,6 +153,18 @@ public class HttpExt implements ReqExt {
             requestSubject.notifyAfterRequest(requestContentDto);
         }
         return execute;
+    }
+
+    /**
+     * 添加链路追踪id
+     *
+     * @param requestContentDto {@link requestContentDto}
+     */
+    private void setTraceId(RequestContentDto requestContentDto) {
+        String requestGroup = requestContentDto.getRequestGroup();
+        // 添加链路追踪id
+        requestGroup = requestGroup != null ? requestGroup : ReqHolder.getTraceId();
+        requestContentDto.setRequestGroup(requestGroup);
     }
 
 

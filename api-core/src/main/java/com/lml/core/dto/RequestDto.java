@@ -50,7 +50,7 @@ public class RequestDto {
 
     /**
      * 请求组的名字
-     * TODO yugi: 2021/1/15 不推荐写在json文件中,因为一个json文件可以是不同的分组,可以通过InitUtil加载脚本后把分组设置进去,暂时没有想到更好的方法╮(╯▽╰)╭
+     * 如果请求组为空的时候,使用ReqHolder+RequestTrace的方式来动态生成请求组
      */
     private String requestGroup;
 
