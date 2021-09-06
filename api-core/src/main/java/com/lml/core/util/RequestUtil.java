@@ -21,7 +21,7 @@ public class RequestUtil {
     /**
      * 请求的url默认从缓存读取,这个是默认的key
      */
-    private final String REQUEST_URL = "${url}";
+    private final String REQUEST_URL = "{{url}}";
 
     /**
      * 执行get请求
