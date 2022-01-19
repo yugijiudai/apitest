@@ -23,4 +23,19 @@ public class InitUtilTest {
         GlobalVariableUtil.setCache("{{noise}}", "{\"term\": {\"hello\": {\"value\": 1234}}}");
         System.out.println(InitUtil.loadReqContent("demo/variableRequest.json5").toStringPretty());
     }
+
+
+    @Test
+    public void testInitArr() {
+        String param1 = "{\"query\": {\"bool\": {\"must\": [{\"terms\": {\"content_ad_noise\": \"#{contentAdNoise}\"} } ] } } }";
+        GlobalVariableUtil.setCache("#{contentAdNoise}", Lists.newArrayList());
+        System.out.println(ScriptFormatUtil.formatVariable(param1));
+        GlobalVariableUtil.setCache("#{contentAdNoise}", Lists.newArrayList("高质量广告", "杂音"));
+        System.out.println(ScriptFormatUtil.formatVariable(param1));
+        String param2 = "{\"query\": {\"bool\": {\"must\": [{\"terms\": {\"content_ad_noise\": [\"{{contentAdNoise}}\"]} } ] } } }";
+        GlobalVariableUtil.setCache("{{contentAdNoise}}", Lists.newArrayList());
+        System.out.println(ScriptFormatUtil.formatAllVariable(param2));
+        GlobalVariableUtil.setCache("{{contentAdNoise}}", Lists.newArrayList("高质量广告", "杂音"));
+        System.out.println(ScriptFormatUtil.formatAllVariable(param2));
+    }
 }

@@ -91,6 +91,10 @@ public class ScriptFormatUtil {
             // 匹配"#{xxx}",所以要截取第一个和最后一个双引号即#{xxx}
             String cacheKey = match.substring(1, match.length() - 1);
             List<String> cache = (List<String>) GlobalVariableUtil.getCache(cacheKey);
+            if (cache.size() == 0) {
+                script = script.replace(match, "[]");
+                continue;
+            }
             StringBuilder arrayString = new StringBuilder("[");
             for (String tmp : cache) {
                 arrayString.append("\"").append(tmp).append("\"").append(",");
@@ -183,6 +187,9 @@ public class ScriptFormatUtil {
      * @param list 列表的数据
      */
     public String getArrayScript(List<Object> list) {
+        if (list.size() == 0) {
+            return "";
+        }
         return CollUtil.join(list, ",", "\"", "\"");
     }
 }
