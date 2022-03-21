@@ -1,6 +1,5 @@
 package com.lml.core.util;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -190,6 +189,8 @@ public class ScriptFormatUtil {
         if (list.size() == 0) {
             return "";
         }
-        return CollUtil.join(list, ",", "\"", "\"");
+        // CollUtil.join有bug,如果list里面有元素带有一个转义的双引号,会被直接去掉,导致出来后无法转成json
+        // return CollUtil.join(list, ",", "\"", "\"");
+        return JSONUtil.parseArray(list).toString();
     }
 }
