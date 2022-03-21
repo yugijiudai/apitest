@@ -1,7 +1,9 @@
 package com.lml.core.util;
 
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -16,7 +18,7 @@ public class InitUtilTest {
 
     @Test
     public void testVariable() {
-        GlobalVariableUtil.setCache("{{allBrand}}", Lists.newArrayList("\"资生堂", "兰蔻", "雅诗兰黛\"", "\\'迪奥"));
+        GlobalVariableUtil.setCache("{{allBrand}}", Lists.newArrayList("\"资生堂", "兰蔻", "雅诗兰黛\"", "'迪奥"));
         GlobalVariableUtil.setCache("{{post}}", "主贴");
         GlobalVariableUtil.setCache("{{money}}", 434.654);
         GlobalVariableUtil.setCache("{{startTime}}", 1622474);
@@ -29,27 +31,46 @@ public class InitUtilTest {
 
 
     @Test
+    public void testInitSingle() {
+        GlobalVariableUtil.setCache("{{post}}", "\"主贴");
+        GlobalVariableUtil.setCache("${post}", "\"主贴");
+        String param1 = "{\"query\": {\"bool\": {\"must\": [{\"term\": {\"is_main_post\": {\"value\": \"{{post}}\"} } } ] } } }";
+        String param2 = "{\"query\": {\"bool\": {\"must\": [{\"term\": {\"is_main_post\": {\"value\": \"${post}\"} } } ] } } }";
+        JSONObject result1 = this.formatAll(param1);
+        JSONObject result2 = this.formatVariable(param2);
+        Assert.assertEquals(result1, result2);
+    }
+
+
+    @Test
     public void testInitArr() {
-        List<String> list = Lists.newArrayList("高质量广告", "\"杂音", "低质量广告\"", "\\'自发内容");
         String param1 = "{\"query\": {\"bool\": {\"must\": [{\"terms\": {\"content_ad_noise\": \"#{contentAdNoise}\"} } ] } } }";
+        String param2 = "{\"query\": {\"bool\": {\"must\": [{\"terms\": {\"content_ad_noise\": [\"{{contentAdNoise}}\"]} } ] } } }";
         List<String> emptyList = Lists.newArrayList();
         GlobalVariableUtil.setCache("#{contentAdNoise}", emptyList);
-        this.formatVariable(param1);
-        GlobalVariableUtil.setCache("#{contentAdNoise}", list);
-        this.formatVariable(param1);
-        String param2 = "{\"query\": {\"bool\": {\"must\": [{\"terms\": {\"content_ad_noise\": [\"{{contentAdNoise}}\"]} } ] } } }";
         GlobalVariableUtil.setCache("{{contentAdNoise}}", emptyList);
-        this.formatAll(param2);
+        JSONObject empty1 = this.formatVariable(param1);
+        JSONObject empty2 = this.formatAll(param2);
+        Assert.assertEquals(empty1, empty2);
+
+        List<String> list = Lists.newArrayList("高质量广告", "\"杂音", "低质量广告\"", "'自发内容");
+        GlobalVariableUtil.setCache("#{contentAdNoise}", list);
         GlobalVariableUtil.setCache("{{contentAdNoise}}", list);
-        this.formatAll(param2);
+        JSONObject arr1 = this.formatVariable(param1);
+        JSONObject arr2 = this.formatAll(param2);
+        Assert.assertEquals(arr1, arr2);
     }
 
-    private void formatAll(String param) {
-        System.out.println(JSONUtil.parseObj(ScriptFormatUtil.formatAllVariable(param)));
+    private JSONObject formatAll(String param) {
+        JSONObject result = JSONUtil.parseObj(ScriptFormatUtil.formatAllVariable(param));
+        System.out.println(result);
+        return result;
     }
 
-    private void formatVariable(String param) {
-        System.out.println(JSONUtil.parseObj(ScriptFormatUtil.formatVariable(param)));
+    private JSONObject formatVariable(String param) {
+        JSONObject result = JSONUtil.parseObj(ScriptFormatUtil.formatVariable(param));
+        System.out.println(result);
+        return result;
     }
 
 }

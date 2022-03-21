@@ -3,6 +3,7 @@ package com.lml.core.util;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -70,7 +71,9 @@ public class ScriptFormatUtil {
     private String formatNormalVariable(String script) {
         List<String> all = ReUtil.findAll(REGEX, script, 0);
         for (String match : all) {
-            script = script.replace(match, GlobalVariableUtil.getCache(match).toString());
+            String val = GlobalVariableUtil.getCache(match).toString();
+            String arrayScript = getArrayScript(Lists.newArrayList(val));
+            script = script.replace(match, arrayScript.substring(1, arrayScript.length() - 1));
         }
         return script;
     }
@@ -166,8 +169,9 @@ public class ScriptFormatUtil {
         if (StringUtils.isBlank(val)) {
             return script.replace(match + ",", val);
         }
-        // 如果是json格式则直接替换,如果不是证明是某一个值,需要往前后各补双引号
-        String replace = JSONUtil.isJsonObj(val) ? val : "\"" + val + "\"";
+        // 如果是json格式则直接替换,如果不是证明是某一个值,放到list里面去处理,因为有可能这个值有转义的双引号,不这样处理出来的时候转义符反斜杠会丢失
+        String replace = JSONUtil.isJsonObj(val) ? val : getArrayScript(Lists.newArrayList(val));
+        // String replace = JSONUtil.isJsonObj(val) ? val : "\"" + val + "\"";
         return script.replace(match, replace);
     }
 
