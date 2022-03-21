@@ -89,16 +89,8 @@ public class ScriptFormatUtil {
         for (String match : arrAll) {
             // 匹配"#{xxx}",所以要截取第一个和最后一个双引号即#{xxx}
             String cacheKey = match.substring(1, match.length() - 1);
-            List<String> cache = (List<String>) GlobalVariableUtil.getCache(cacheKey);
-            if (cache.size() == 0) {
-                script = script.replace(match, "[]");
-                continue;
-            }
-            StringBuilder arrayString = new StringBuilder("[");
-            for (String tmp : cache) {
-                arrayString.append("\"").append(tmp).append("\"").append(",");
-            }
-            script = script.replace(match, arrayString.substring(0, arrayString.length() - 1) + "]");
+            Object val = GlobalVariableUtil.getCache(cacheKey);
+            script = script.replace(match, val.toString().length() == 0 ? "[]" : JSONUtil.parseArray(val).toString());
         }
         return script;
     }
@@ -191,6 +183,7 @@ public class ScriptFormatUtil {
         }
         // CollUtil.join有bug,如果list里面有元素带有一个转义的双引号,会被直接去掉,导致出来后无法转成json
         // return CollUtil.join(list, ",", "\"", "\"");
-        return JSONUtil.parseArray(list).toString();
+        String arrString = JSONUtil.parseArray(list).toString();
+        return arrString.substring(1, arrString.length() - 1);
     }
 }
