@@ -52,4 +52,8 @@ public class SettingDto {
      */
     private Boolean registerDefaultRequestObserver = true;
 
+    /**
+     * 自定义初始化实现类所在的包,用来扩展自定义初始化的动作,如果包有多个,可以使用逗号隔开
+     */
+    private String customerInitObserverPackage;
 }

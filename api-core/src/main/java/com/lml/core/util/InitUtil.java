@@ -17,6 +17,9 @@ import com.lml.core.ext.ReqAdapter;
 import com.lml.core.ext.ReqExt;
 import com.lml.core.factory.RequestHandlerFactory;
 import com.lml.core.handler.RequestHandler;
+import com.lml.core.service.BaseObserver;
+import com.lml.core.service.CustomerInitObserver;
+import com.lml.core.service.CustomerInitSubject;
 import com.lml.core.service.RequestLogObserver;
 import com.lml.core.service.RequestObserver;
 import com.lml.core.service.RequestRecordObserver;
@@ -50,9 +53,16 @@ public class InitUtil {
     @Getter
     private RequestSubject requestSubject = new RequestSubject();
 
+    /**
+     * 自定义初始化的观察者
+     */
+    @Getter
+    private CustomerInitSubject customerInitSubject = new CustomerInitSubject();
+
     static {
         initRequestHandle();
         initDefaultRequestContent();
+        initCustomerObserver();
     }
 
     /**
@@ -124,6 +134,20 @@ public class InitUtil {
     }
 
     /**
+     * 初始化自定义初始化观察者
+     */
+    private void initCustomerObserver() {
+        Map<String, BaseObserver> map = initObserver(settingDto.getCustomerInitObserverPackage(), CustomerInitObserver.class);
+        for (BaseObserver observer : map.values()) {
+            customerInitSubject.add((CustomerInitObserver) observer);
+        }
+        // 排序
+        customerInitSubject.order();
+        log.debug("===================初始化自定义初始化观察者{}的子类完成===================", CustomerInitObserver.class.getSimpleName());
+        log.debug("总共注册了的观者列表:{}", customerInitSubject.getCustomerInitObserverList());
+    }
+
+    /**
      * 初始化application.properties,把内容load到SettingDto里
      *
      * @return {@link SettingDto}
@@ -151,8 +175,11 @@ public class InitUtil {
             observerMap.put(requestObserverImpl.getClass().getName(), requestObserverImpl);
         }
         // 配置指定需要注册的观察者
-        Map<String, RequestObserver> extraMap = initExtraRequestObserver();
-        observerMap.putAll(extraMap);
+        // Map<String, RequestObserver> extraMap = initExtraRequestObserver();
+        Map<String, BaseObserver> extraMap = initObserver(settingDto.getRequestObserverPackage(), RequestObserver.class);
+        for (Map.Entry<String, BaseObserver> entry : extraMap.entrySet()) {
+            observerMap.put(entry.getKey(), (RequestObserver) entry.getValue());
+        }
         for (RequestObserver observer : observerMap.values()) {
             requestSubject.add(observer);
         }
@@ -196,5 +223,35 @@ public class InitUtil {
         }
         return needToRegisterMap;
     }
+
+    private Map<String, BaseObserver> initObserver(String observerPackage, Class<? extends BaseObserver> observerClz) {
+        Map<String, BaseObserver> needToRegisterMap = Maps.newLinkedHashMap();
+        if (StringUtils.isBlank(observerPackage)) {
+            log.debug("没有额外需要注册的请求监听者,额外注册结束......");
+            return needToRegisterMap;
+        }
+        String[] packageList = observerPackage.split(",");
+        Set<Class<?>> allChildren = Sets.newLinkedHashSet();
+        for (String packageName : packageList) {
+            Set<Class<?>> childrenClazz = ClassUtil.scanPackageBySuper(packageName, observerClz);
+            log.debug("{}包下找到{}个需要额外注册的类", packageName, childrenClazz.size());
+            allChildren.addAll(childrenClazz);
+        }
+        // 遍历所有扫描到的子类
+        for (Class<?> clz : allChildren) {
+            try {
+                BaseObserver eh = (BaseObserver) clz.getDeclaredConstructor().newInstance();
+                log.debug("初始化{}成功,这个是否要注册到列表:{}", eh, eh.isRegister());
+                if (eh.isRegister()) {
+                    needToRegisterMap.put(eh.getClass().getName(), eh);
+                }
+            }
+            catch (Exception e) {
+                throw new InitException("注册监听者失败!", e);
+            }
+        }
+        return needToRegisterMap;
+    }
+
 
 }

@@ -7,7 +7,7 @@ import com.lml.core.dto.RequestContentDto;
  * @apiNote 请求操作的抽象服务层, 通过实现此类为请求的前置或者后置操作提供额外的操作
  * @since 2019-09-23
  */
-public interface RequestObserver {
+public interface RequestObserver extends BaseObserver {
 
     /**
      * 请求前置处理
@@ -38,19 +38,5 @@ public interface RequestObserver {
      * @param throwable         请求失败的相关异常
      */
     void onFailRequest(RequestContentDto requestContentDto, Throwable throwable);
-
-    /**
-     * 是否需要注册到监听者列表
-     *
-     * @return true表示注册, false表示不注册
-     */
-    boolean isRegister();
-
-    /**
-     * 注册到监听者列表的顺序
-     *
-     * @return 数字越大顺序越后
-     */
-    int registerOrder();
 
 }

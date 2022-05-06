@@ -158,7 +158,7 @@ public class HttpExt implements ReqExt {
     /**
      * 添加链路追踪id
      *
-     * @param requestContentDto {@link requestContentDto}
+     * @param requestContentDto {@link RequestContentDto}
      */
     private void setTraceId(RequestContentDto requestContentDto) {
         String requestGroup = requestContentDto.getRequestGroup();
