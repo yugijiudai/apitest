@@ -176,7 +176,6 @@ public class InitUtil {
             observerMap.put(requestObserverImpl.getClass().getName(), requestObserverImpl);
         }
         // 配置指定需要注册的观察者
-        // Map<String, RequestObserver> extraMap = initExtraRequestObserver();
         Map<String, BaseObserver> extraMap = initObserver(settingDto.getRequestObserverPackage(), RequestObserver.class);
         for (Map.Entry<String, BaseObserver> entry : extraMap.entrySet()) {
             observerMap.put(entry.getKey(), (RequestObserver) entry.getValue());
@@ -191,40 +190,12 @@ public class InitUtil {
     }
 
     /**
-     * 初始化额外的请求处理器,这个需要在lml.properties中声明需要扫描的包
+     * 初始化对应的观察者,这个需要在lml.properties中声明需要扫描的包
      *
+     * @param observerPackage 要扫描的包
+     * @param observerClz     BaseObserver的子类
      * @return key是所在的包名, value是对应的子类, 这样做是为了出现同名同包的子类, 防止重复注册
      */
-    private Map<String, RequestObserver> initExtraRequestObserver() {
-        Map<String, RequestObserver> needToRegisterMap = Maps.newLinkedHashMap();
-        String requestObserverPackage = settingDto.getRequestObserverPackage();
-        if (StringUtils.isBlank(requestObserverPackage)) {
-            log.debug("没有额外需要注册的请求监听者,额外注册结束......");
-            return needToRegisterMap;
-        }
-        String[] packageList = requestObserverPackage.split(",");
-        Set<Class<?>> allChildren = Sets.newLinkedHashSet();
-        for (String packageName : packageList) {
-            Set<Class<?>> childrenClazz = ClassUtil.scanPackageBySuper(packageName, RequestObserver.class);
-            log.debug("{}包下找到{}个需要额外注册的类", packageName, childrenClazz.size());
-            allChildren.addAll(childrenClazz);
-        }
-        // 遍历所有扫描到的子类
-        for (Class<?> clz : allChildren) {
-            try {
-                RequestObserver eh = (RequestObserver) clz.getDeclaredConstructor().newInstance();
-                log.debug("初始化{}成功,这个是否要注册到列表:{}", eh, eh.isRegister());
-                if (eh.isRegister()) {
-                    needToRegisterMap.put(eh.getClass().getName(), eh);
-                }
-            }
-            catch (Exception e) {
-                throw new InitException("注册请求监听者失败!", e);
-            }
-        }
-        return needToRegisterMap;
-    }
-
     private Map<String, BaseObserver> initObserver(String observerPackage, Class<? extends BaseObserver> observerClz) {
         Map<String, BaseObserver> needToRegisterMap = Maps.newLinkedHashMap();
         if (StringUtils.isBlank(observerPackage)) {
