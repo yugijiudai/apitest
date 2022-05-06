@@ -145,6 +145,7 @@ public class InitUtil {
         customerInitSubject.order();
         log.debug("===================初始化自定义初始化观察者{}的子类完成===================", CustomerInitObserver.class.getSimpleName());
         log.debug("总共注册了的观者列表:{}", customerInitSubject.getCustomerInitObserverList());
+        customerInitSubject.notifyInit();
     }
 
     /**
