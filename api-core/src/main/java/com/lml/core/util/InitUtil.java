@@ -60,6 +60,14 @@ public class InitUtil {
     private CustomerInitSubject customerInitSubject = new CustomerInitSubject();
 
     static {
+        initAll();
+    }
+
+
+    /**
+     * 初始化所有
+     */
+    public void initAll() {
         initRequestHandle();
         initDefaultRequestContent();
         initCustomerObserver();
