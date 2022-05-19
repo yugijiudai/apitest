@@ -3,6 +3,7 @@ package com.lml.core.util;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.google.common.collect.Lists;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +51,7 @@ public class ScriptFormatUtil {
      */
     public String formatVariable(String script) {
         // 这里用fastjson读取文件再转换成原来的jsonObject,原因是hutool的jsonObject无法支持json5格式
-        script = JSONObject.parseObject(script).toString();
+        script = JSONObject.parseObject(script, Feature.OrderedField).toString();
         log.debug("原始脚本是:{}", script);
         script = formatNormalVariable(script);
         script = formatArrayVariable(script);
