@@ -39,7 +39,8 @@ public class ScriptFormatUtil {
     /**
      * {{}}的正则匹配
      */
-    private final String ANY_REGEX = "\"\\{\\{(.*?)}}\"";
+    private final String ANY_REGEX = "\\{\\{(.*?)}}";
+    // private final String ANY_REGEX = "\"\\{\\{(.*?)}}\"";
 
     /**
      * 替换有占位符${xxx}的脚本
@@ -127,8 +128,8 @@ public class ScriptFormatUtil {
     public String formatAllVariable(String script) {
         List<String> arrAll = ReUtil.findAll(ANY_REGEX, script, 0);
         for (String match : arrAll) {
-            String cacheKey = match.substring(1, match.length() - 1);
-            Object val = GlobalVariableUtil.getCache(cacheKey);
+            // String cacheKey = match.substring(1, match.length() - 1);
+            Object val = GlobalVariableUtil.getCache(match);
             if (val instanceof String) {
                 script = handleString(script, match, val.toString());
                 continue;
@@ -153,7 +154,12 @@ public class ScriptFormatUtil {
      * @return 返回被替换的的脚本
      */
     private String handleList(String script, String match, List<Object> val) {
-        return script.replace(match, getArrayScript(val));
+        if (val.size() == 0) {
+            return script.replace("\"" + match + "\"", "");
+        }
+        String replace = getArrayScript(val);
+        return script.replace(match, replace.substring(1, replace.length() - 1));
+        // return script.replace(match, getArrayScript(val));
     }
 
     /**
@@ -170,9 +176,12 @@ public class ScriptFormatUtil {
             return script.replace(match + ",", val);
         }
         // 如果是json格式则直接替换,如果不是证明是某一个值,放到list里面去处理,因为有可能这个值有转义的双引号,不这样处理出来的时候转义符反斜杠会丢失
-        String replace = JSONUtil.isJsonObj(val) ? val : getArrayScript(Lists.newArrayList(val));
-        // String replace = JSONUtil.isJsonObj(val) ? val : "\"" + val + "\"";
-        return script.replace(match, replace);
+        if (JSONUtil.isJsonObj(val)) {
+            return script.replace("\"" + match + "\"", val);
+        }
+        String replace = getArrayScript(Lists.newArrayList(val));
+        return script.replace(match, replace.substring(1, replace.length() - 1));
+        // return script.replace(match, replace);
     }
 
 

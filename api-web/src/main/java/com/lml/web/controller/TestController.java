@@ -40,6 +40,14 @@ public class TestController {
         return buildJsonSuccess(userDto);
     }
 
+    @PostMapping(value = "/testPost")
+    public JSONObject testPost(@RequestBody UserDto userDto, HttpServletRequest req) {
+        System.out.println(userDto);
+        System.out.println(req.getHeader("Content-Type"));
+        System.out.println(req.getHeader("Authorization"));
+        return buildJsonSuccess(userDto);
+    }
+
 
     @PostMapping(value = "/uploadFile")
     public JSONObject uploadFile(MultipartFile[] uploadFile, String name) {
