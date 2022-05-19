@@ -6,6 +6,7 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.setting.dialect.Props;
@@ -59,6 +60,8 @@ public class InitUtil {
     @Getter
     private CustomerInitSubject customerInitSubject = new CustomerInitSubject();
 
+    private final JSONConfig JSON_CONFIG = new JSONConfig().setOrder(true);
+
     static {
         initAll();
     }
@@ -81,7 +84,7 @@ public class InitUtil {
      */
     public JSONObject loadReqContent(String fileName) {
         String script = loadScript(fileName);
-        return JSONUtil.parseObj(ScriptFormatUtil.formatVariable(script));
+        return JSONUtil.parseObj(ScriptFormatUtil.formatVariable(script), JSON_CONFIG);
     }
 
 
@@ -127,7 +130,7 @@ public class InitUtil {
         for (int i = 0; i < array.size(); i++) {
             JSONObject obj = array.getJSONObject(i);
             obj.forEach((key, val) -> GlobalVariableUtil.setCache("${" + key + "}", val));
-            JSONObject newObj = JSONUtil.parseObj(ScriptFormatUtil.formatVariable(script));
+            JSONObject newObj = JSONUtil.parseObj(ScriptFormatUtil.formatVariable(script), JSON_CONFIG);
             needHandle.add(newObj);
         }
         return needHandle;
