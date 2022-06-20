@@ -112,7 +112,8 @@ public class InitUtil {
         if (resource == null) {
             throw new InitException("找不到要加载的脚本 " + fileName);
         }
-        return FileUtil.readString(FileUtil.file(resource), StandardCharsets.UTF_8);
+        log.debug("需要加载的文件地址是:{}", resource.getPath());
+        return FileUtil.readString(resource, StandardCharsets.UTF_8);
     }
 
     /**
