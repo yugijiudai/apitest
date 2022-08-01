@@ -3,7 +3,7 @@ package com.lml.core.util;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.db.Db;
 import cn.hutool.db.ds.DSFactory;
-import com.lml.core.enums.DataSourceEnum;
+import com.lml.core.dto.SettingDto;
 import com.lml.core.enums.DataSourcePoolEnum;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +33,11 @@ public class DbUtil {
      * new PooledDSFactory()<br/>
      * </code>
      *
-     * @param dataSourceEnum 数据源枚举
      * @return 返回对应的数据源
      */
-    public Db getDb(DataSourceEnum dataSourceEnum) {
-        String dataSourcePool = InitUtil.getSettingDto().getDataSourcePool();
+    public Db getDb() {
+        SettingDto settingDto = InitUtil.getSettingDto();
+        String dataSourcePool = settingDto.getDataSourcePool();
         if (StringUtils.isNotBlank(dataSourcePool)) {
             // 如果有指定的数据源连接池,则使用指定的
             DataSourcePoolEnum dataSourcePoolEnum = DataSourcePoolEnum.parse(dataSourcePool);
@@ -46,7 +46,12 @@ public class DbUtil {
                 DSFactory.setCurrentDSFactory(obj);
             }
         }
-        DataSource dataSource = DSFactory.get(dataSourceEnum.getDataSource());
+        // 如果为空则默认使用dev
+        String dbConfig = settingDto.getDataSourceConfig();
+        if (StringUtils.isBlank(dbConfig)) {
+            dbConfig = "dev";
+        }
+        DataSource dataSource = DSFactory.get(dbConfig);
         return Db.use(dataSource);
     }
 

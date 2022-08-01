@@ -1,5 +1,14 @@
-[api]
+[dev]
 url=jdbc:mysql://localhost:3306/api_test?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT
+user=root
+pass=111111
+showSql=true
+formatSql=false
+showParams=true
+
+
+[test]
+url=jdbc:mysql://localhost:3300/api_test?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT
 user=root
 pass=111111
 showSql=true

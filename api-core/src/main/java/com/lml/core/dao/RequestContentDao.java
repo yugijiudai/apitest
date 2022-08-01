@@ -5,7 +5,6 @@ import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
 import cn.hutool.http.Method;
 import cn.hutool.json.JSONUtil;
-import com.lml.core.enums.DataSourceEnum;
 import com.lml.core.enums.RequestStatusEnum;
 import com.lml.core.exception.BizException;
 import com.lml.core.exception.DaoException;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RequestContentDao {
 
-    private Db db = DbUtil.getDb(DataSourceEnum.API);
+    private final Db db = DbUtil.getDb();
 
     private static final String TABLE = "request_content";
 
