@@ -11,7 +11,7 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 16/03/2021 11:57:06
+ Date: 01/08/2022 10:32:03
 */
 
 SET NAMES utf8mb4;
@@ -24,18 +24,18 @@ FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `request_content`;
 CREATE TABLE `request_content`
 (
-    `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT '' 主键 '',
-    `name`           varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '' 接口的名字 '',
-    `method`         varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL COMMENT '' 请求的方法 '',
-    `start_time`     datetime                                                      DEFAULT NULL COMMENT '' 请求开始时间 '',
-    `end_time`       datetime                                                      DEFAULT NULL COMMENT '' 请求结束时间 '',
-    `headers`        varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '' 请求头部 '',
-    `content`        longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '' 请求的内容 '',
-    `request_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '' 请求状态 OK:成功；FAIL: 失败 '',
-    `url`            varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '' 接口地址 '',
-    `exception_msg`  longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '' 异常信息 '',
-    `request_group`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  DEFAULT NULL COMMENT '' 请求分组名字 '',
-    `thread_name`    varchar(50) COLLATE utf8mb4_general_ci                        DEFAULT NULL COMMENT '' 当前请求的线程名字 '',
+    `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `name`           varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  DEFAULT NULL COMMENT '接口的名字',
+    `method`         varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL COMMENT '请求的方法',
+    `start_time`     datetime                                                       DEFAULT NULL COMMENT '请求开始时间',
+    `end_time`       datetime                                                       DEFAULT NULL COMMENT '请求结束时间',
+    `headers`        varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '请求头部',
+    `content`        longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '请求的内容',
+    `request_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  DEFAULT NULL COMMENT '请求状态 OK:成功；FAIL: 失败',
+    `url`            varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口地址',
+    `exception_msg`  longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '异常信息',
+    `request_group`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci   DEFAULT NULL COMMENT '请求分组名字',
+    `thread_name`    varchar(50) COLLATE utf8mb4_general_ci                         DEFAULT NULL COMMENT '当前请求的线程名字',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
