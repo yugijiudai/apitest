@@ -30,7 +30,7 @@ public class GlobalVariableUtil {
      * @return 返回缓存的结果
      */
     public Object getCache(String key) {
-        Object val = timedCache.get(key);
+        Object val = timedCache.get(generateKey(key));
         if (val == null) {
             throw new BizException("找不到:" + key + "的缓存!");
         }
@@ -64,6 +64,17 @@ public class GlobalVariableUtil {
      * @param val 缓存的值
      */
     public void setCache(String key, Object val) {
-        timedCache.put(key, val);
+        timedCache.put(generateKey(key), val);
+    }
+
+    /**
+     * key的策略,用线程id拼接，防止不同现成set同样的key导致覆盖情况
+     *
+     * @param key 需要设置的key
+     * @return 拼接好的key
+     */
+    private String generateKey(String key) {
+        Boolean shareGlobalCache = InitUtil.getSettingDto().getShareGlobalCache();
+        return shareGlobalCache ? key : Thread.currentThread().getId() + "-" + key;
     }
 }

@@ -62,4 +62,8 @@ public class SettingDto {
      */
     private String dataSourceConfig;
 
+    /**
+     * GlobalVariableUtil的内存是否共享给不同的线程,即不同线程下同key能否被覆盖
+     */
+    private Boolean shareGlobalCache = false;
 }

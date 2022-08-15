@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONObject;
@@ -60,7 +59,7 @@ public class InitUtil {
     @Getter
     private CustomerInitSubject customerInitSubject = new CustomerInitSubject();
 
-    private final JSONConfig JSON_CONFIG = new JSONConfig().setOrder(true);
+    private final JSONConfig JSON_CONFIG = new JSONConfig();
 
     static {
         initAll();
@@ -96,9 +95,17 @@ public class InitUtil {
      */
     public ReqAdapter initReqAdapter(Class<?> clz) {
         String initClassName = clz != null ? clz.getName() : settingDto.getReqExt();
-        ReqExt reqExt = ReflectUtil.newInstance(initClassName);
-        log.info("默认的http请求类是{}.............", reqExt);
-        return new ReqAdapter(reqExt);
+        try {
+            Class<?> aClass = ClassUtil.getClassLoader().loadClass(initClassName);
+            ReqExt reqExt = (ReqExt) aClass.getDeclaredConstructor().newInstance();
+            // 不能用这个来实例化，貌似会有bug，有些项目会提示classNotFound
+            // ReqExt reqExt = ReflectUtil.newInstance(initClassName);
+            log.info("默认的http请求类是{}.............", reqExt);
+            return new ReqAdapter(reqExt);
+        }
+        catch (Exception e) {
+            throw new InitException(e);
+        }
     }
 
     /**
@@ -161,7 +168,7 @@ public class InitUtil {
     }
 
     /**
-     * 初始化application.properties,把内容load到SettingDto里
+     * 初始化lml.properties,把内容load到SettingDto里
      *
      * @return {@link SettingDto}
      */

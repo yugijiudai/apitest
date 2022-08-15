@@ -19,7 +19,7 @@
 
     <groupId>com.lml</groupId>
     <artifactId>apitest</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3</version>
     <name>apitest</name>
 
     <description>api测试</description>
