@@ -1,5 +1,6 @@
 package com.lml.core.dto;
 
+import cn.hutool.setting.Setting;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -66,4 +67,10 @@ public class SettingDto {
      * GlobalVariableUtil的内存是否共享给不同的线程,即不同线程下同key能否被覆盖
      */
     private Boolean shareGlobalCache = false;
+
+    /**
+     * db.setting的配置
+     */
+    private Setting dbSetting;
+
 }

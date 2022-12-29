@@ -8,6 +8,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import cn.hutool.setting.Setting;
 import cn.hutool.setting.dialect.Props;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -177,6 +178,8 @@ public class InitUtil {
         //获取key对应的value值
         SettingDto settingDto = new SettingDto();
         BeanUtil.copyProperties(prop, settingDto);
+        Setting dbSetting = new Setting("db.setting", true);
+        settingDto.setDbSetting(dbSetting);
         log.debug("初始化配置成功:{}", settingDto);
         return settingDto;
     }

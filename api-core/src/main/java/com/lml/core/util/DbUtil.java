@@ -1,8 +1,11 @@
 package com.lml.core.util;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.db.Db;
 import cn.hutool.db.ds.DSFactory;
+import cn.hutool.log.level.Level;
+import cn.hutool.setting.Setting;
 import com.lml.core.dto.SettingDto;
 import com.lml.core.enums.DataSourcePoolEnum;
 import lombok.experimental.UtilityClass;
@@ -52,6 +55,13 @@ public class DbUtil {
             dbConfig = "dev";
         }
         DataSource dataSource = DSFactory.get(dbConfig);
+        Setting setting = settingDto.getDbSetting().getSetting(dbConfig);
+        Level level = Convert.toEnum(Level.class, setting.getStr("sqlLevel").toUpperCase(), Level.DEBUG);
+        Boolean showSql = setting.getBool("showSql", false);
+        Boolean formatSql = setting.getBool("formatSql", false);
+        Boolean showParams = setting.getBool("showParams", false);
+        // 为了兼容分组的这些参数，这里需要重新从setting读取并且设置
+        cn.hutool.db.DbUtil.setShowSqlGlobal(showSql, formatSql, showParams, level);
         return Db.use(dataSource);
     }
 
