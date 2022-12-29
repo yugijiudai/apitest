@@ -39,6 +39,22 @@ public class DbUtil {
      * @return 返回对应的数据源
      */
     public Db getDb() {
+        // 如果为空则默认使用dev
+        SettingDto settingDto = InitUtil.getSettingDto();
+        String dbConfig = settingDto.getDataSourceConfig();
+        if (StringUtils.isBlank(dbConfig)) {
+            dbConfig = "dev";
+        }
+        return getDb(dbConfig);
+    }
+
+    /**
+     * 根据环境获取动态获取对应的db
+     *
+     * @param group 相关环境
+     * @return 返回对应的数据源
+     */
+    public Db getDb(String group) {
         SettingDto settingDto = InitUtil.getSettingDto();
         String dataSourcePool = settingDto.getDataSourcePool();
         if (StringUtils.isNotBlank(dataSourcePool)) {
@@ -49,13 +65,8 @@ public class DbUtil {
                 DSFactory.setCurrentDSFactory(obj);
             }
         }
-        // 如果为空则默认使用dev
-        String dbConfig = settingDto.getDataSourceConfig();
-        if (StringUtils.isBlank(dbConfig)) {
-            dbConfig = "dev";
-        }
-        DataSource dataSource = DSFactory.get(dbConfig);
-        Setting setting = settingDto.getDbSetting().getSetting(dbConfig);
+        DataSource dataSource = DSFactory.get(group);
+        Setting setting = settingDto.getDbSetting().getSetting(group);
         Level level = Convert.toEnum(Level.class, setting.getStr("sqlLevel").toUpperCase(), Level.DEBUG);
         Boolean showSql = setting.getBool("showSql", false);
         Boolean formatSql = setting.getBool("formatSql", false);
