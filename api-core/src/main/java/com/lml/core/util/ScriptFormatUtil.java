@@ -87,7 +87,6 @@ public class ScriptFormatUtil {
      * @return 把#{xxx}转成["a", "b"]这种形式,并且替换对应的变量
      * @deprecated 此方法后面不会再使用，请使用{@link #formatAllVariable(String)}
      */
-    @SuppressWarnings("unchecked")
     @Deprecated
     private String formatArrayVariable(String script) {
         List<String> arrAll = ReUtil.findAll(ARR_REGEX, script, 0);
@@ -129,7 +128,6 @@ public class ScriptFormatUtil {
     public String formatAllVariable(String script) {
         List<String> arrAll = ReUtil.findAll(ANY_REGEX, script, 0);
         for (String match : arrAll) {
-            // String cacheKey = match.substring(1, match.length() - 1);
             Object val = GlobalVariableUtil.getCache(match);
             if (val instanceof String) {
                 script = handleString(script, match, val.toString());
@@ -140,10 +138,27 @@ public class ScriptFormatUtil {
                 continue;
             }
             if (val instanceof Number) {
-                script = script.replace(match, val.toString());
+                script = handleNumber(script, match, val.toString());
             }
         }
         return script;
+    }
+
+    /**
+     * 处理数字类型的替换
+     *
+     * @param script       需要替换的脚本
+     * @param match        正则匹配到的内容
+     * @param replaceValue 要替换的值
+     * @return 返回被替换的的脚本
+     */
+    private static String handleNumber(String script, String match, String replaceValue) {
+        int startIndex = script.indexOf(match) - 1;
+        StringBuilder sb = new StringBuilder(script.replace(match, replaceValue));
+        // 移除数字头尾的双引号
+        sb.deleteCharAt(startIndex);
+        sb.deleteCharAt(startIndex + replaceValue.length());
+        return sb.toString();
     }
 
     /**
@@ -160,7 +175,6 @@ public class ScriptFormatUtil {
         }
         String replace = getArrayScript(val);
         return script.replace(match, replace.substring(1, replace.length() - 1));
-        // return script.replace(match, getArrayScript(val));
     }
 
     /**
@@ -177,12 +191,11 @@ public class ScriptFormatUtil {
             return script.replace(match + ",", val);
         }
         // 如果是json格式则直接替换,如果不是证明是某一个值,放到list里面去处理,因为有可能这个值有转义的双引号,不这样处理出来的时候转义符反斜杠会丢失
-        if (JSONUtil.isJsonObj(val)) {
+        if (JSONUtil.isTypeJSONObject(val)) {
             return script.replace("\"" + match + "\"", val);
         }
         String replace = getArrayScript(Lists.newArrayList(val));
         return script.replace(match, replace.substring(1, replace.length() - 1));
-        // return script.replace(match, replace);
     }
 
 
