@@ -61,6 +61,21 @@ public class InitUtilTest {
         Assert.assertEquals(arr1, arr2);
     }
 
+    @Test
+    public void testFormatScript() {
+        GlobalVariableUtil.setCache("{{testId}}", "abc123232");
+        GlobalVariableUtil.setCache("{{all}}", 10);
+        GlobalVariableUtil.setCache("{{time}}", 20);
+        GlobalVariableUtil.setCache("{{success}}", 2);
+        GlobalVariableUtil.setCache("{{money}}", 325);
+        GlobalVariableUtil.setCache("{{sentimentList}}", Lists.newArrayList(-1, 0, 1));
+        GlobalVariableUtil.setCache("{{brandList}}", Lists.newArrayList("-6", "0", "6"));
+        GlobalVariableUtil.setCache("{{nullList}}", Lists.newArrayList());
+        System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/wechatMsgTemplate.json5")));
+        System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/mailTemplate.txt")));
+        System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/requestNum.json5")));
+    }
+
     private JSONObject formatAll(String param) {
         JSONObject result = JSONUtil.parseObj(ScriptFormatUtil.formatAllVariable(param));
         System.out.println(result);

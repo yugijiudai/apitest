@@ -1,0 +1,4 @@
+{
+  "title": "【id:<font color=\"#9267c2\">{{testId}}</font>】 已经运行了<font color=\"blue\">{{all}}</font>个用例,耗时<font color=\"warning\">{{time}}s</font>，大家饮茶啦。\n",
+  "passed": ">成功:<font color=\"green\">{{success}}</font>个\n"
+}

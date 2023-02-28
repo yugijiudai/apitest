@@ -1,0 +1,43 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "terms": {
+            "sentiment": [
+              "{{sentimentList}}"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "brandList": [
+              "{{brandList}}"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "nullList": [
+              "{{nullList}}"
+            ]
+          }
+        },
+        {
+          "term": {
+            "money": {
+              "value": "{{money}}"
+            }
+          }
+        },
+        {
+          "term": {
+            "brand": {
+              "value": "{{money}}"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

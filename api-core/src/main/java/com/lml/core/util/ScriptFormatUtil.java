@@ -1,6 +1,8 @@
 package com.lml.core.util;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
@@ -145,7 +147,7 @@ public class ScriptFormatUtil {
     }
 
     /**
-     * 处理数字类型的替换
+     * 处理数字类型的替换，这里会判断被替换的值的前后是否带有双引号，如果有会做移除操作，确保json格式的数字类型被替换正确
      *
      * @param script       需要替换的脚本
      * @param match        正则匹配到的内容
@@ -153,14 +155,13 @@ public class ScriptFormatUtil {
      * @return 返回被替换的的脚本
      */
     private static String handleNumber(String script, String match, String replaceValue) {
-        int startIndex = script.indexOf(match) - 1;
-        StringBuilder sb = new StringBuilder(script.replace(match, replaceValue));
-        if (JSONUtil.isTypeJSON(sb.toString())) {
-            // json类型的话要移除被替换的内容头尾的双引号，确保替换后是数值类型
-            sb.deleteCharAt(startIndex);
-            sb.deleteCharAt(startIndex + replaceValue.length());
+        // 判断被替换的值前后是否有双引号，如果有需要做移除操作
+        String matchPlusQuotation = buildMatchPlusQuotation(match);
+        int idx = script.indexOf(matchPlusQuotation);
+        if (idx == -1) {
+            return script.replace(match, replaceValue);
         }
-        return sb.toString();
+        return script.replace(matchPlusQuotation, replaceValue);
     }
 
     /**
@@ -172,11 +173,12 @@ public class ScriptFormatUtil {
      * @return 返回被替换的的脚本
      */
     private String handleList(String script, String match, List<Object> val) {
+        String matchPlusQuotation = buildMatchPlusQuotation(match);
         if (val.size() == 0) {
-            return script.replace("\"" + match + "\"", "");
+            return script.replace(matchPlusQuotation, "");
         }
         String replace = getArrayScript(val);
-        return script.replace(match, replace.substring(1, replace.length() - 1));
+        return script.replace(matchPlusQuotation, replace);
     }
 
     /**
@@ -194,7 +196,7 @@ public class ScriptFormatUtil {
         }
         // 如果是json格式则直接替换,如果不是证明是某一个值,放到list里面去处理,因为有可能这个值有转义的双引号,不这样处理出来的时候转义符反斜杠会丢失
         if (JSONUtil.isTypeJSONObject(val)) {
-            return script.replace("\"" + match + "\"", val);
+            return script.replace(buildMatchPlusQuotation(match), val);
         }
         String replace = getArrayScript(Lists.newArrayList(val));
         return script.replace(match, replace.substring(1, replace.length() - 1));
@@ -207,12 +209,26 @@ public class ScriptFormatUtil {
      * @param list 列表的数据
      */
     public String getArrayScript(List<Object> list) {
-        if (list.size() == 0) {
-            return "";
+        long numberSize = list.stream().filter(obj -> obj instanceof Number).count();
+        if (numberSize == list.size()) {
+            // 判断是否全部为数字
+            return CollUtil.join(list, ",");
         }
         // CollUtil.join有bug,如果list里面有元素带有一个转义的双引号,会被直接去掉,导致出来后无法转成json
         // return CollUtil.join(list, ",", "\"", "\"");
         String arrString = JSONUtil.parseArray(list).toString();
         return arrString.substring(1, arrString.length() - 1);
     }
+
+    /**
+     * 匹配的字符串前后加双引号
+     *
+     * @param match 匹配的字符
+     * @return 返回添加双引号的格式
+     */
+    private String buildMatchPlusQuotation(String match) {
+        return StrUtil.format("\"{}\"", match);
+    }
+
+
 }

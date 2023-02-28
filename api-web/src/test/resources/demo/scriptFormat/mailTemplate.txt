@@ -1,0 +1,3 @@
+<h1> <div><font color='red'>做撚做啊，用例执行失败啦</font></div> </h1>
+<div><font>已经运行了<font color='green'>{{all}}</font>个用例，耗时<font color='warning'>{{time}}s</font>，大家饮茶啦。</font></div>
+<div>成功:<font color='info'>{{success}}</font>个</div>
