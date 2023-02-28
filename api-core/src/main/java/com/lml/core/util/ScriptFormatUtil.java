@@ -155,9 +155,11 @@ public class ScriptFormatUtil {
     private static String handleNumber(String script, String match, String replaceValue) {
         int startIndex = script.indexOf(match) - 1;
         StringBuilder sb = new StringBuilder(script.replace(match, replaceValue));
-        // 移除数字头尾的双引号
-        sb.deleteCharAt(startIndex);
-        sb.deleteCharAt(startIndex + replaceValue.length());
+        if (JSONUtil.isTypeJSON(sb.toString())) {
+            // json类型的话要移除被替换的内容头尾的双引号，确保替换后是数值类型
+            sb.deleteCharAt(startIndex);
+            sb.deleteCharAt(startIndex + replaceValue.length());
+        }
         return sb.toString();
     }
 
