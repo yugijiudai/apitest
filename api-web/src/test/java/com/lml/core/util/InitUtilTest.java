@@ -76,6 +76,29 @@ public class InitUtilTest {
         System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/requestNum.json5")));
     }
 
+    @Test
+    public void testSqlFormat() {
+        GlobalVariableUtil.setCache("{{brand_name}}", "");
+        GlobalVariableUtil.setCache("{{category_name}}", "香水");
+        GlobalVariableUtil.setCache("{{site_id}}", 10);
+        GlobalVariableUtil.setCache("{{volume_type_name}}", "and volume_type_name in ('PGC', 'BGC', 'UGC')");
+        GlobalVariableUtil.setCache("{{sentiment}}", Lists.newArrayList(-1, 0, 1));
+        GlobalVariableUtil.setCache("{{cat_name}}", Lists.newArrayList("微博", "微信", "新闻"));
+        String sqlScript = InitUtil.loadScript("demo/scriptFormat/sqlDemo.txt");
+        String assertSql = "select sum(volume_cnt) cnt\n" +
+                "from t_brand_category_indicator_v01\n" +
+                "where 1 = 1\n" +
+                "  and category_name = '香水'\n" +
+                "  \n" +
+                "  and site_id = 10\n" +
+                "  and publish_date between '2023-06-01' and '2023-06-03'\n" +
+                "  and sentiment in (-1, 0, 1)\n" +
+                "  and cat_name in ('微博', '微信', '新闻')\n" +
+                "  and volume_type_name in ('PGC', 'BGC', 'UGC')";
+        String result = ScriptFormatUtil.formatSqlCondition(sqlScript);
+        Assert.assertEquals(result, assertSql);
+    }
+
     private JSONObject formatAll(String param) {
         JSONObject result = JSONUtil.parseObj(ScriptFormatUtil.formatAllVariable(param));
         System.out.println(result);

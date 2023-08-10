@@ -65,6 +65,39 @@ public class ScriptFormatUtil {
 
 
     /**
+     * 格式化sql的脚本
+     *
+     * @param script 需要格式化的sql脚本
+     * @return 返回格式化好的sql脚本
+     */
+    @SuppressWarnings("unchecked")
+    public String formatSqlCondition(String script) {
+        List<String> arrAll = ReUtil.findAll(ANY_REGEX, script, 0);
+        for (String match : arrAll) {
+            Object val = GlobalVariableUtil.getCache(match);
+            if (val instanceof String || val instanceof Number) {
+                script = script.replace(match, val.toString());
+                continue;
+            }
+            if (val instanceof List) {
+                Object firstEle = ((List<?>) val).get(0);
+                if (firstEle instanceof Number) {
+                    script = script.replace(match, val.toString().replace("[", "(").replace("]", ")"));
+                }
+                else if (firstEle instanceof String) {
+                    List<String> tmpList = (List<String>) val;
+                    String join = CollUtil.join(tmpList, ", ", "'", "'");
+                    join = StrUtil.addPrefixIfNot(join, "(");
+                    join = StrUtil.addSuffixIfNot(join, ")");
+                    script = script.replace(match, join);
+                }
+            }
+        }
+        return script;
+    }
+
+
+    /**
      * 格式化普通类型的变量
      *
      * @param script 加载的脚本

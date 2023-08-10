@@ -1,0 +1,10 @@
+select sum(volume_cnt) cnt
+from t_brand_category_indicator_v01
+where 1 = 1
+  and category_name = '{{category_name}}'
+  {{brand_name}}
+  and site_id = {{site_id}}
+  and publish_date between '2023-06-01' and '2023-06-03'
+  and sentiment in {{sentiment}}
+  and cat_name in {{cat_name}}
+  {{volume_type_name}}
