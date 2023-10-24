@@ -225,7 +225,8 @@ public class ScriptFormatUtil {
     private String handleString(String script, String match, String val) {
         // 如果空字符串则删除后面的逗号
         if (StringUtils.isBlank(val)) {
-            return script.replace(match + ",", val);
+            return script.replace(match, val);
+            // return script.replace(match + ",", val);
         }
         // 如果是json格式则直接替换,如果不是证明是某一个值,放到list里面去处理,因为有可能这个值有转义的双引号,不这样处理出来的时候转义符反斜杠会丢失
         if (JSONUtil.isTypeJSONObject(val)) {

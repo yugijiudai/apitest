@@ -36,6 +36,13 @@
               "value": "{{money}}"
             }
           }
+        },
+        {
+          "term": {
+            "topic": {
+              "value": "{{topic}}"
+            }
+          }
         }
       ]
     }

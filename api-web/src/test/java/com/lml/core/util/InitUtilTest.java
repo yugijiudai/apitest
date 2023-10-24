@@ -71,6 +71,7 @@ public class InitUtilTest {
         GlobalVariableUtil.setCache("{{sentimentList}}", Lists.newArrayList(-1, 0, 1));
         GlobalVariableUtil.setCache("{{brandList}}", Lists.newArrayList("-6", "0", "6"));
         GlobalVariableUtil.setCache("{{nullList}}", Lists.newArrayList());
+        GlobalVariableUtil.setCache("{{topic}}", "");
         System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/wechatMsgTemplate.json5")));
         System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/mailTemplate.txt")));
         System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/requestNum.json5")));
