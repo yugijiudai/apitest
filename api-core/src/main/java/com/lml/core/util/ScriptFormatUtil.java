@@ -11,6 +11,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -168,8 +169,8 @@ public class ScriptFormatUtil {
                 script = handleString(script, match, val.toString());
                 continue;
             }
-            if (val instanceof List) {
-                script = handleList(script, match, (List<Object>) val);
+            if (val instanceof Collection) {
+                script = handleCollection(script, match, (Collection<Object>) val);
                 continue;
             }
             if (val instanceof Number) {
@@ -205,9 +206,9 @@ public class ScriptFormatUtil {
      * @param val    要替换的值
      * @return 返回被替换的的脚本
      */
-    private String handleList(String script, String match, List<Object> val) {
+    private String handleCollection(String script, String match, Collection<Object> val) {
         String matchPlusQuotation = buildMatchPlusQuotation(match);
-        if (val.size() == 0) {
+        if (val.isEmpty()) {
             return script.replace(matchPlusQuotation, "");
         }
         String replace = getArrayScript(val);
@@ -242,7 +243,8 @@ public class ScriptFormatUtil {
      *
      * @param list 列表的数据
      */
-    public String getArrayScript(List<Object> list) {
+    @SuppressWarnings("VulnerableCodeUsages")
+    public String getArrayScript(Collection<Object> list) {
         long numberSize = list.stream().filter(obj -> obj instanceof Number).count();
         if (numberSize == list.size()) {
             // 判断是否全部为数字

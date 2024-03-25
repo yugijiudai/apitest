@@ -3,10 +3,12 @@ package com.lml.core.util;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author yugi
@@ -98,6 +100,19 @@ public class InitUtilTest {
                 "  and volume_type_name in ('PGC', 'BGC', 'UGC')";
         String result = ScriptFormatUtil.formatSqlCondition(sqlScript);
         Assert.assertEquals(result, assertSql);
+    }
+
+    @Test
+    public void testInitSet() {
+        Set<String> cntSets = Sets.newLinkedHashSet();
+        cntSets.add("3CE一滴泪液体眼影");
+        cntSets.add("3CE丝绒唇釉");
+        GlobalVariableUtil.setCache("{{productName}}", cntSets);
+        String param1 = "{\"query\": {\"bool\": {\"must\": [{\"terms\": {\"productName\": [\"{{productName}}\"] } } ] } } }";
+        String param2 = "{\"query\":{\"bool\":{\"must\":[{\"terms\":{\"productName\":[\"3CE一滴泪液体眼影\",\"3CE丝绒唇釉\"]}}]}}}";
+        JSONObject result1 = this.formatAll(param1);
+        JSONObject result2 = this.formatAll(param2);
+        Assert.assertEquals(result1, result2);
     }
 
     private JSONObject formatAll(String param) {
