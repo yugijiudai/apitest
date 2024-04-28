@@ -1,6 +1,5 @@
 package com.lml.core.util;
 
-import cn.hutool.aop.ProxyUtil;
 import cn.hutool.aop.aspects.Aspect;
 import cn.hutool.aop.interceptor.CglibInterceptor;
 import cn.hutool.core.util.ReflectUtil;
@@ -39,7 +38,7 @@ public class MyProxyUtil {
      */
     public <T> T initAspect(Class<T> clz, Class<? extends Aspect> aspect) {
         try {
-            return ProxyUtil.proxy(clz.getDeclaredConstructor().newInstance(), aspect);
+            return proxy(clz, aspect, null);
         }
         catch (Exception e) {
             throw new InitException("类初始化失败!");
@@ -57,7 +56,7 @@ public class MyProxyUtil {
      * @return 初始化的对象
      */
     @SuppressWarnings("unchecked")
-    public static <T> T proxy(Class<T> clz, Class<? extends Aspect> aspect, Class<? extends CglibInterceptor> myInterceptor) {
+    public <T> T proxy(Class<T> clz, Class<? extends Aspect> aspect, Class<? extends CglibInterceptor> myInterceptor) {
         final Enhancer enhancer = new Enhancer();
         try {
             Aspect aspectClz = ReflectUtil.newInstance(aspect);
@@ -68,7 +67,7 @@ public class MyProxyUtil {
             return (T) enhancer.create();
         }
         catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new InitException("类初始化失败!");
         }
     }
 
