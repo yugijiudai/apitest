@@ -1,6 +1,5 @@
 package com.lml.core.handler;
 
-import cn.hutool.json.JSONObject;
 import com.lml.core.dto.RequestDto;
 import com.lml.core.dto.SettingDto;
 import com.lml.core.enums.MethodEnum;
@@ -13,6 +12,7 @@ import com.lml.core.vo.RestVo;
  * @apiNote 请求处理器
  * @since 2019-08-06
  */
+@SuppressWarnings("rawtypes")
 public interface RequestHandler {
 
     ReqAdapter REQ_ADAPTER = InitUtil.initReqAdapter(null);
@@ -30,7 +30,7 @@ public interface RequestHandler {
      * @param requestDto {@link RequestDto}
      * @return {@link RestVo}
      */
-    RestVo<JSONObject> handleRequest(RequestDto requestDto);
+    RestVo handleRequest(RequestDto requestDto);
 
     /**
      * 默认的处理
@@ -38,7 +38,7 @@ public interface RequestHandler {
      * @param requestDto {@link RequestDto}
      * @return {@link RestVo}
      */
-    default RestVo<JSONObject> doHandle(RequestDto requestDto) {
+    default RestVo doHandle(RequestDto requestDto) {
         SettingDto settingDto = InitUtil.getSettingDto();
         String baseUrl = settingDto.getBaseUrl();
         // 如果是使用相对路径,则重新拼接好要请求的url地址

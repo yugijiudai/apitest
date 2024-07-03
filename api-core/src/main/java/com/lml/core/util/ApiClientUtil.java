@@ -25,6 +25,7 @@ import java.util.Map;
  */
 @UtilityClass
 @Slf4j
+@SuppressWarnings("rawtypes")
 public class ApiClientUtil {
 
     /**
@@ -65,6 +66,7 @@ public class ApiClientUtil {
      * @param json          加载好的脚本
      * @param callBackLists 请求接口后需要执行的回调,是个list,可以自己定义然后回调的处理顺序
      */
+    @SuppressWarnings("unchecked")
     public void doApiRequestCallBack(JSONObject json, List<RequestCallBackHandler> callBackLists) {
         RestVo<JSONObject> actual = doApiRequest(json);
         // 获取断言的数据
@@ -85,7 +87,7 @@ public class ApiClientUtil {
      * @param script 加载好的脚本的路径
      * @return 返回请求后的数据
      */
-    public RestVo<JSONObject> doApiRequest(String script) {
+    public RestVo doApiRequest(String script) {
         JSONObject json = InitUtil.loadReqContent(script);
         return doApiRequest(json);
     }
@@ -96,7 +98,7 @@ public class ApiClientUtil {
      * @param json 请求的对象
      * @return 返回请求后的数据
      */
-    public RestVo<JSONObject> doApiRequest(JSONObject json) {
+    public RestVo doApiRequest(JSONObject json) {
         // 将request的内容映射到对应的实体类里
         RequestDto requestDto = JSONUtil.toBean(json.getStr(REQ_KEY), RequestDto.class);
         MethodEnum method = MethodEnum.parse(requestDto.getMethod());
