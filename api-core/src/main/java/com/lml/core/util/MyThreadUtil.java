@@ -33,17 +33,16 @@ public class MyThreadUtil {
     public void handleConcurrent(List<Object> list, int threadNum, TaskHandler taskHandler) throws Exception {
         // 线程数不能超过list的数量
         threadNum = Math.min(threadNum, list.size());
-        try (ExecutorService executorService = ThreadUtil.newExecutor(threadNum)) {
-            List<Object> callBackList = Lists.newLinkedList();
-            // 把每一个任务放在一个list里面
-            List<Callable<Object>> taskList = list.stream().map(obj -> (Callable<Object>) () -> taskHandler.runTask(obj)).collect(Collectors.toList());
-            List<Future<Object>> futures = executorService.invokeAll(taskList);
-            for (Future<Object> future : futures) {
-                callBackList.add(future.get());
-            }
-            taskHandler.callBack(callBackList);
-            executorService.shutdown();
+        ExecutorService executorService = ThreadUtil.newExecutor(threadNum);
+        List<Object> callBackList = Lists.newLinkedList();
+        // 把每一个任务放在一个list里面
+        List<Callable<Object>> taskList = list.stream().map(obj -> (Callable<Object>) () -> taskHandler.runTask(obj)).collect(Collectors.toList());
+        List<Future<Object>> futures = executorService.invokeAll(taskList);
+        for (Future<Object> future : futures) {
+            callBackList.add(future.get());
         }
+        taskHandler.callBack(callBackList);
+        executorService.shutdown();
     }
 
     /**
@@ -58,20 +57,19 @@ public class MyThreadUtil {
         partitionNum = Math.max(partitionNum, 1);
         List<List<Object>> partition = ListUtils.partition(list, partitionNum);
         List<Object> callBackList = Lists.newLinkedList();
-        try (ExecutorService executorService = ThreadUtil.newExecutor(partition.size())) {
-            List<Callable<List<Object>>> taskList = Lists.newLinkedList();
-            for (List<Object> param : partition) {
-                taskList.add(() -> {
-                    log.info("线程【{}】,需要处理{}", Thread.currentThread().getName(), param);
-                    return param.stream().map(taskHandler::runTask).collect(Collectors.toList());
-                });
-            }
-            List<Future<List<Object>>> futures = executorService.invokeAll(taskList);
-            for (Future<List<Object>> future : futures) {
-                callBackList.addAll(future.get());
-            }
-            taskHandler.callBack(callBackList);
-            executorService.shutdown();
+        ExecutorService executorService = ThreadUtil.newExecutor(partition.size());
+        List<Callable<List<Object>>> taskList = Lists.newLinkedList();
+        for (List<Object> param : partition) {
+            taskList.add(() -> {
+                log.info("线程【{}】,需要处理{}", Thread.currentThread().getName(), param);
+                return param.stream().map(taskHandler::runTask).collect(Collectors.toList());
+            });
         }
+        List<Future<List<Object>>> futures = executorService.invokeAll(taskList);
+        for (Future<List<Object>> future : futures) {
+            callBackList.addAll(future.get());
+        }
+        taskHandler.callBack(callBackList);
+        executorService.shutdown();
     }
 }
