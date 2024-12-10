@@ -165,7 +165,7 @@ public class ScriptFormatUtil {
         List<String> arrAll = ReUtil.findAll(ANY_REGEX, script, 0);
         for (String match : arrAll) {
             Object val = GlobalVariableUtil.getCache(match);
-            if (val instanceof String) {
+            if (val instanceof String || JSONUtil.isTypeJSONObject(val.toString())) {
                 script = handleString(script, match, val.toString());
                 continue;
             }
