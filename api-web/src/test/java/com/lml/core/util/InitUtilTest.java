@@ -40,7 +40,7 @@ public class InitUtilTest {
         String param2 = "{\"query\": {\"bool\": {\"must\": [{\"term\": {\"is_main_post\": {\"value\": \"${post}\"} } } ] } } }";
         JSONObject result1 = this.formatAll(param1);
         JSONObject result2 = this.formatVariable(param2);
-        Assert.assertEquals(result1, result2);
+        Assert.assertEquals(result1.toString(), result2.toString());
     }
 
 
@@ -53,14 +53,14 @@ public class InitUtilTest {
         GlobalVariableUtil.setCache("{{contentAdNoise}}", emptyList);
         JSONObject empty1 = this.formatVariable(param1);
         JSONObject empty2 = this.formatAll(param2);
-        Assert.assertEquals(empty1, empty2);
+        Assert.assertEquals(empty1.toString(), empty2.toString());
 
         List<String> list = Lists.newArrayList("高质量广告", "\"杂音", "低质量广告\"", "'自发内容");
         GlobalVariableUtil.setCache("#{contentAdNoise}", list);
         GlobalVariableUtil.setCache("{{contentAdNoise}}", list);
         JSONObject arr1 = this.formatVariable(param1);
         JSONObject arr2 = this.formatAll(param2);
-        Assert.assertEquals(arr1, arr2);
+        Assert.assertEquals(arr1.toString(), arr2.toString());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class InitUtilTest {
         String param2 = "{\"query\":{\"bool\":{\"must\":[{\"terms\":{\"productName\":[\"3CE一滴泪液体眼影\",\"3CE丝绒唇釉\"]}}]}}}";
         JSONObject result1 = this.formatAll(param1);
         JSONObject result2 = this.formatAll(param2);
-        Assert.assertEquals(result1, result2);
+        Assert.assertEquals(result1.toString(), result2.toString());
     }
 
     private JSONObject formatAll(String param) {

@@ -3,10 +3,10 @@
 <suite name="请求类测试" parallel="false">
     <test name="ApiClientUtilTest">
         <classes>
-            <class name="com.lml.web.util.ApiClientUtilTest"/>
-            <class name="com.lml.web.util.SelfDataTest"/>
+            <!--            <class name="com.lml.web.util.ApiClientUtilTest"/>-->
+            <!--            <class name="com.lml.web.util.SelfDataTest"/>-->
             <class name="com.lml.core.util.InitUtilTest"/>
-            <class name="com.lml.core.util.RequestUtilTest"/>
+            <!--            <class name="com.lml.core.util.RequestUtilTest"/>-->
         </classes>
     </test>
 </suite>

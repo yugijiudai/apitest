@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.4</version>
+        <version>3.5.3</version>
         <relativePath/>
     </parent>
 
@@ -25,8 +25,8 @@
     <description>api测试</description>
 
     <properties>
-        <java.version>1.8</java.version>
-        <testNg.version>7.4.0</testNg.version>
+        <java.version>24</java.version>
+        <testNg.version>7.11.0</testNg.version>
     </properties>
 
     <dependencyManagement>
@@ -127,11 +127,19 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <!--                    <version>3.8.1</version>-->
+                    <!--                    <configuration>-->
+                    <!--                        <source>24</source>-->
+                    <!--                        <target>24</target>-->
+                    <!--                        <encoding>UTF-8</encoding>-->
+                    <!--                    </configuration>-->
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                        <encoding>UTF-8</encoding>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
             </plugins>
