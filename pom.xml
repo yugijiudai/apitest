@@ -19,7 +19,7 @@
 
     <groupId>com.lml</groupId>
     <artifactId>apitest</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <name>apitest</name>
 
     <description>api测试</description>
@@ -31,9 +31,7 @@
 
     <dependencyManagement>
 
-
         <dependencies>
-
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
@@ -110,6 +108,13 @@
                 <groupId>cglib</groupId>
                 <artifactId>cglib</artifactId>
                 <version>3.3.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.38</version>
+                <optional>true</optional>
             </dependency>
 
         </dependencies>

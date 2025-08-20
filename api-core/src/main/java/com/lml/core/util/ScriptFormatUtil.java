@@ -19,8 +19,8 @@ import java.util.List;
  * @apiNote 脚本格式化工具类
  * @since 2021-08-30
  */
-@UtilityClass
 @Slf4j
+@UtilityClass
 public class ScriptFormatUtil {
 
 
