@@ -162,9 +162,20 @@ public class ScriptFormatUtil {
      */
     @SuppressWarnings("unchecked")
     public String formatAllVariable(String script) {
+        return formatAllVariableDynamic(script, false);
+    }
+
+    /**
+     * 格式化{{}}类型的变量,适用各种类型的参数,后续建议使用这个来格式化
+     *
+     * @param script      加载的脚本
+     * @param cacheIsNull 是否允许缓存为null
+     * @return 把{{xxx}}替换成对应的内容
+     */
+    public String formatAllVariableDynamic(String script, Boolean cacheIsNull) {
         List<String> arrAll = ReUtil.findAll(ANY_REGEX, script, 0);
         for (String match : arrAll) {
-            Object val = GlobalVariableUtil.getCache(match);
+            Object val = cacheIsNull ? GlobalVariableUtil.getCacheWithNull(match) : GlobalVariableUtil.getCache(match);
             if (val instanceof String || JSONUtil.isTypeJSONObject(val.toString())) {
                 script = handleString(script, match, val.toString());
                 continue;

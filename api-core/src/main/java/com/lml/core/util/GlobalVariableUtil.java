@@ -37,6 +37,22 @@ public class GlobalVariableUtil {
         return val;
     }
 
+
+    /**
+     * 获取缓存，如果没有，则返回空
+     *
+     * @param key 缓存的key
+     * @return 拿到的缓存值
+     */
+    public Object getCacheWithNull(String key) {
+        try {
+            return getCache(key);
+        }
+        catch (Exception e) {
+            return "";
+        }
+    }
+
     /**
      * 获取当前全部缓存
      *
