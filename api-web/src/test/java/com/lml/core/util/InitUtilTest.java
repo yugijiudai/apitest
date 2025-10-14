@@ -115,6 +115,16 @@ public class InitUtilTest {
         Assert.assertEquals(result1.toString(), result2.toString());
     }
 
+    @Test
+    public void testTxtFormat() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.set("name", "张三").set("id", 2);
+        GlobalVariableUtil.setCache("{{knowledgeWords}}", jsonObject.toString());
+        System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/jsonFormat.txt")));
+        GlobalVariableUtil.setCache("{{knowledgeWords}}", jsonObject);
+        System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/jsonFormat.txt")));
+    }
+
     private JSONObject formatAll(String param) {
         JSONObject result = JSONUtil.parseObj(ScriptFormatUtil.formatAllVariable(param));
         System.out.println(result);

@@ -242,7 +242,12 @@ public class ScriptFormatUtil {
         }
         // 如果是json格式则直接替换,如果不是证明是某一个值,放到list里面去处理,因为有可能这个值有转义的双引号,不这样处理出来的时候转义符反斜杠会丢失
         if (JSONUtil.isTypeJSONObject(val)) {
-            return script.replace(buildMatchPlusQuotation(match), val);
+            // 这里需要根据情况来判断是否加双引号
+            String quotationMatch = buildMatchPlusQuotation(match);
+            if (script.contains(quotationMatch)) {
+                return script.replace(quotationMatch, val);
+            }
+            return script.replace(match, val);
         }
         String replace = getArrayScript(Lists.newArrayList(val));
         return script.replace(match, replace.substring(1, replace.length() - 1));
