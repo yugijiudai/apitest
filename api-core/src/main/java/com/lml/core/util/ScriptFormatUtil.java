@@ -219,6 +219,10 @@ public class ScriptFormatUtil {
      */
     private String handleCollection(String script, String match, Collection<Object> val) {
         String matchPlusQuotation = buildMatchPlusQuotation(match);
+        if (!script.contains(matchPlusQuotation)) {
+            // 先默认在前面加上双引号(在json文件需要用双引号包住，其他文件则不需要)，如果匹配不到，再用回原来的
+            matchPlusQuotation = match;
+        }
         if (val.isEmpty()) {
             return script.replace(matchPlusQuotation, "");
         }

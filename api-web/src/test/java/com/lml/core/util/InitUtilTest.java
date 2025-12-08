@@ -123,6 +123,9 @@ public class InitUtilTest {
         System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/jsonFormat.txt")));
         GlobalVariableUtil.setCache("{{knowledgeWords}}", jsonObject);
         System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/jsonFormat.txt")));
+        GlobalVariableUtil.setCache("{{knowledgeWords}}", List.of("珠江", "1664"));
+        System.out.println(ScriptFormatUtil.formatAllVariable(InitUtil.loadScript("demo/scriptFormat/jsonFormat.txt")));
+
     }
 
     private JSONObject formatAll(String param) {
