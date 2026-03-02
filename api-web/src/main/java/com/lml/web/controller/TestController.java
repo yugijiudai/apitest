@@ -81,6 +81,12 @@ public class TestController {
         return buildSuccess(random);
     }
 
+    @PostMapping(value = "/normalResult")
+    public String normalResult(@RequestBody UserDto userDto) {
+        return userDto.getName();
+    }
+
+
     @GetMapping(value = "/getUser")
     public JSONObject getUser(UserDto userDto, HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
@@ -107,7 +113,7 @@ public class TestController {
     private JSONObject buildJsonSuccess(Object data) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.set("code", HttpStatus.OK.value());
-        jsonObject.set("data", JSONUtil.toJsonStr(data));
+        jsonObject.set("data", JSONUtil.parseObj(data));
         return jsonObject;
     }
 
