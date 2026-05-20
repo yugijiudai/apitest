@@ -30,7 +30,7 @@ public interface RequestHandler {
      * @param requestDto {@link RequestDto}
      * @return {@link RestVo}
      */
-    RestVo handleRequest(RequestDto requestDto);
+    <T> RestVo<T> handleRequest(RequestDto requestDto);
 
     /**
      * 默认的处理
@@ -38,7 +38,7 @@ public interface RequestHandler {
      * @param requestDto {@link RequestDto}
      * @return {@link RestVo}
      */
-    default RestVo doHandle(RequestDto requestDto) {
+    default <T> RestVo<T> doHandle(RequestDto requestDto) {
         SettingDto settingDto = InitUtil.getSettingDto();
         String baseUrl = settingDto.getBaseUrl();
         // 如果是使用相对路径,则重新拼接好要请求的url地址

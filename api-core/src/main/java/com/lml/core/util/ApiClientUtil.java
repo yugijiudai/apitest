@@ -87,7 +87,7 @@ public class ApiClientUtil {
      * @param script 加载好的脚本的路径
      * @return 返回请求后的数据
      */
-    public RestVo doApiRequest(String script) {
+    public <T> RestVo<T> doApiRequest(String script) {
         JSONObject json = InitUtil.loadReqContent(script);
         return doApiRequest(json);
     }
@@ -98,7 +98,7 @@ public class ApiClientUtil {
      * @param json 请求的对象
      * @return 返回请求后的数据
      */
-    public RestVo doApiRequest(JSONObject json) {
+    public <T> RestVo<T> doApiRequest(JSONObject json) {
         // 将request的内容映射到对应的实体类里
         RequestDto requestDto = JSONUtil.toBean(json.getStr(REQ_KEY), RequestDto.class);
         MethodEnum method = MethodEnum.parse(requestDto.getMethod());
