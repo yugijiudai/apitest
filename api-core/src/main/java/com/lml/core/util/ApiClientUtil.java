@@ -484,7 +484,7 @@ public class ApiClientUtil {
      * @return 返回设置好的格式, 格式如下:["JSESSIONID=xxx", "name=lml"]
      */
     private List<String> getCookieList(Object cookiesJsonArr) {
-        List<com.alibaba.fastjson.JSONObject> array = com.alibaba.fastjson.JSONArray.parseArray(cookiesJsonArr.toString(), com.alibaba.fastjson.JSONObject.class);
+        List<JSONObject> array = JSONUtil.toList(cookiesJsonArr.toString(), JSONObject.class);
         return array.stream()
                 .flatMap(obj -> obj.entrySet().stream())
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
