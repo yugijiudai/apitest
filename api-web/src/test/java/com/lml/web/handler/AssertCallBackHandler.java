@@ -104,7 +104,7 @@ public class AssertCallBackHandler implements RequestCallBackHandler {
             String key = entry.getKey();
             List<String> actualHeaderValue = actualHeaders.getOrDefault(key, null);
             Assert.assertNotNull(actualHeaderValue, StrUtil.format("找不到key为:{}的响应头", key));
-            Assert.assertEquals(actualHeaderValue.get(0), entry.getValue(), StrUtil.format("响应头:【{}】断言失败", key));
+            Assert.assertEquals(actualHeaderValue.getFirst(), entry.getValue(), StrUtil.format("响应头:【{}】断言失败", key));
         }
     }
 

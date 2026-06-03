@@ -14,10 +14,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.lml.core.dto.SettingDto;
 import com.lml.core.exception.InitException;
-import com.lml.core.ext.ReqAdapter;
-import com.lml.core.ext.ReqExt;
-import com.lml.core.factory.RequestHandlerFactory;
-import com.lml.core.handler.RequestHandler;
 import com.lml.core.service.BaseObserver;
 import com.lml.core.service.CustomerInitObserver;
 import com.lml.core.service.CustomerInitSubject;
@@ -71,7 +67,6 @@ public class InitUtil {
      * 初始化所有
      */
     public void initAll() {
-        initRequestHandle();
         initDefaultRequestContent();
         initCustomerObserver();
     }
@@ -87,27 +82,6 @@ public class InitUtil {
         return JSONUtil.parseObj(ScriptFormatUtil.formatVariable(script), JSON_CONFIG);
     }
 
-
-    /**
-     * 根据配置文件配置的来初始化http请求的底层调用类
-     *
-     * @param clz 指定使用的请求类,如果没有则使用配置里面的
-     * @return {@link ReqAdapter}
-     */
-    public ReqAdapter initReqAdapter(Class<?> clz) {
-        String initClassName = clz != null ? clz.getName() : settingDto.getReqExt();
-        try {
-            Class<?> aClass = ClassUtil.getClassLoader().loadClass(initClassName);
-            ReqExt reqExt = (ReqExt) aClass.getDeclaredConstructor().newInstance();
-            // 不能用这个来实例化，貌似会有bug，有些项目会提示classNotFound
-            // ReqExt reqExt = ReflectUtil.newInstance(initClassName);
-            log.info("默认的http请求类是{}.............", reqExt);
-            return new ReqAdapter(reqExt);
-        }
-        catch (Exception e) {
-            throw new InitException(e);
-        }
-    }
 
     /**
      * 获取脚本
@@ -145,13 +119,6 @@ public class InitUtil {
         return needHandle;
     }
 
-
-    /**
-     * 初始化请求处理器
-     */
-    private void initRequestHandle() {
-        RequestHandlerFactory.initHandler(RequestHandler.class);
-    }
 
     /**
      * 初始化自定义初始化观察者
